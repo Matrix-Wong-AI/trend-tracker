@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TrendTracker - Global Product Intelligence</title>
+    <title>TrendTracker - 全球产品趋势雷达</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -13,10 +13,11 @@
             --stone: #8c8c8c;
             --mist: #e8e6e3;
             --vermillion: #c45c48;
+            --indigo: #4a5568;
         }
         
         body {
-            font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Noto Sans JP", sans-serif;
             background: var(--paper);
             color: var(--ink);
             line-height: 1.8;
@@ -90,6 +91,19 @@
             align-items: center;
             text-align: center;
             padding: 120px 40px 80px;
+            position: relative;
+        }
+        
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(196, 92, 72, 0.03) 0%, transparent 70%);
+            pointer-events: none;
         }
         
         .hero-badge {
@@ -97,6 +111,16 @@
             color: var(--vermillion);
             letter-spacing: 0.2em;
             margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .hero-badge::before {
+            content: "";
+            width: 20px;
+            height: 1px;
+            background: var(--vermillion);
         }
         
         .hero h1 {
@@ -104,6 +128,7 @@
             font-weight: 300;
             line-height: 1.4;
             margin-bottom: 30px;
+            letter-spacing: 0.05em;
         }
         
         .hero h1 strong {
@@ -136,13 +161,14 @@
             font-size: 14px;
             letter-spacing: 0.15em;
             text-decoration: none;
-            transition: all 0.4s;
+            transition: all 0.4s ease;
             border: none;
             cursor: pointer;
         }
         
         .cta-primary:hover {
             background: var(--vermillion);
+            transform: translateY(-2px);
         }
         
         .hero-stats {
@@ -160,6 +186,7 @@
         .stat-number {
             font-size: 36px;
             font-weight: 300;
+            color: var(--ink);
         }
         
         .stat-label {
@@ -190,6 +217,7 @@
         .section-title {
             font-size: 32px;
             font-weight: 300;
+            letter-spacing: 0.05em;
         }
         
         .features {
@@ -222,11 +250,13 @@
             font-size: 18px;
             font-weight: 500;
             margin-bottom: 15px;
+            letter-spacing: 0.05em;
         }
         
         .feature p {
             font-size: 14px;
             color: var(--stone);
+            line-height: 1.8;
         }
         
         .how-it-works {
@@ -290,16 +320,23 @@
             border: 1px solid var(--mist);
             padding: 40px 30px;
             text-align: center;
+            position: relative;
             transition: all 0.3s;
         }
         
         .pricing-card:hover {
             border-color: var(--ink);
+            transform: translateY(-5px);
         }
         
         .pricing-card.featured {
             border-color: var(--ink);
             background: var(--ink);
+            color: var(--paper);
+        }
+        
+        .pricing-card.featured .price,
+        .pricing-card.featured .pricing-features li {
             color: var(--paper);
         }
         
@@ -339,7 +376,10 @@
         
         .pricing-card.featured .pricing-features li {
             border-bottom-color: rgba(255,255,255,0.1);
-            color: var(--paper);
+        }
+        
+        .pricing-features li:last-child {
+            border-bottom: none;
         }
         
         .pricing-cta {
@@ -350,11 +390,22 @@
             text-decoration: none;
             border: 1px solid var(--ink);
             color: var(--ink);
+            transition: all 0.3s;
         }
         
         .pricing-card.featured .pricing-cta {
             border-color: var(--paper);
             color: var(--paper);
+        }
+        
+        .pricing-cta:hover {
+            background: var(--ink);
+            color: var(--paper);
+        }
+        
+        .pricing-card.featured .pricing-cta:hover {
+            background: var(--paper);
+            color: var(--ink);
         }
         
         .cta-section {
@@ -368,6 +419,7 @@
             font-size: 28px;
             font-weight: 300;
             margin-bottom: 20px;
+            letter-spacing: 0.05em;
         }
         
         .cta-section p {
@@ -383,6 +435,12 @@
             letter-spacing: 0.15em;
             text-decoration: none;
             display: inline-block;
+            transition: all 0.4s;
+        }
+        
+        .cta-white:hover {
+            background: var(--vermillion);
+            color: var(--paper);
         }
         
         footer {
@@ -410,147 +468,155 @@
     </style>
 </head>
 <body>
+    <!-- Language Switcher -->
     <div class="lang-switch">
-        <a href="index.html" class="active">EN</a>
-        <a href="index-zh.html">中文</a>
+        <a href="index.html">EN</a>
+        <a href="index-zh.html" class="active">中文</a>
         <a href="index-ja.html">日本語</a>
     </div>
 
+    <!-- Navigation -->
     <nav>
         <div class="logo">TRENDTRACKER</div>
         <div class="nav-links">
-            <a href="#features">Features</a>
-            <a href="#how">How It Works</a>
-            <a href="#pricing">Pricing</a>
+            <a href="#features">功能</a>
+            <a href="#how">使用方法</a>
+            <a href="#pricing">定价</a>
         </div>
     </nav>
 
+    <!-- Hero Section -->
     <section class="hero">
         <div class="hero-badge">PRODUCT INTELLIGENCE</div>
-        <h1>Never Miss a<br><strong>Product Trend</strong></h1>
-        <p class="hero-subtitle">Automatically track trending products and discussions from Product Hunt, Reddit, and more. Generate multi-dimensional insights to stay ahead of the market.</p>
-        <a href="#pricing" class="cta-primary">Get Started</a>
+        <h1>不再错过任何<br><strong>产品趋势</strong></h1>
+        <p class="hero-subtitle">自动追踪 Product Hunt、Reddit 等平台的最新产品动态，生成多维度洞察报告，助你把握市场先机。</p>
+        <a href="#pricing" class="cta-primary">开始使用</a>
         
         <div class="hero-stats">
             <div class="stat">
                 <div class="stat-number">20+</div>
-                <div class="stat-label">Daily Products</div>
+                <div class="stat-label">每日产品</div>
             </div>
             <div class="stat">
                 <div class="stat-number">80+</div>
-                <div class="stat-label">Trending Discussions</div>
+                <div class="stat-label">热门讨论</div>
             </div>
             <div class="stat">
                 <div class="stat-number">8</div>
-                <div class="stat-label">Data Sources</div>
+                <div class="stat-label">数据源</div>
             </div>
         </div>
     </section>
 
+    <!-- Features Section -->
     <section class="features" id="features">
         <div class="section-header">
             <div class="section-label">FEATURES</div>
-            <h2 class="section-title">Core Capabilities</h2>
+            <h2 class="section-title">核心功能</h2>
         </div>
         
         <div class="features-grid">
             <div class="feature">
                 <div class="feature-icon">◈</div>
-                <h3>Automated Data Collection</h3>
-                <p>Daily automated scraping of trending products and discussions from Product Hunt, Reddit, and more. No manual searching required.</p>
+                <h3>自动数据采集</h3>
+                <p>每日自动抓取 Product Hunt、Reddit 等平台的热门产品和讨论，无需手动搜索。</p>
             </div>
             <div class="feature">
                 <div class="feature-icon">◉</div>
-                <h3>Multi-Dimensional Analysis</h3>
-                <p>AI-powered product categorization, vote trend analysis, discussion heat mapping, and emerging technology identification.</p>
+                <h3>多维度分析</h3>
+                <p>AI 智能分类产品类型，分析投票趋势、讨论热度，识别新兴技术方向。</p>
             </div>
             <div class="feature">
                 <div class="feature-icon">◎</div>
-                <h3>Visual Reports</h3>
-                <p>Generate beautiful HTML reports with dark theme support. Access trend insights anytime, anywhere.</p>
+                <h3>可视化报告</h3>
+                <p>生成精美的 HTML 报告，支持深色主题，随时随地查看趋势洞察。</p>
             </div>
         </div>
     </section>
 
+    <!-- How It Works -->
     <section class="how-it-works" id="how">
         <div class="section-header">
             <div class="section-label">HOW IT WORKS</div>
-            <h2 class="section-title">Three Simple Steps</h2>
+            <h2 class="section-title">简单三步</h2>
         </div>
         
         <div class="steps">
             <div class="step">
                 <div class="step-number">01</div>
-                <h3>Configure Sources</h3>
-                <p>Add your Product Hunt token, select Reddit communities to monitor</p>
+                <h3>配置数据源</h3>
+                <p>添加 Product Hunt Token，选择关注的 Reddit 板块</p>
             </div>
             <div class="step">
                 <div class="step-number">02</div>
-                <h3>Auto Collection</h3>
-                <p>Daily scheduled scraping of latest products and trending discussions</p>
+                <h3>自动采集</h3>
+                <p>每日定时抓取最新产品和热门讨论</p>
             </div>
             <div class="step">
                 <div class="step-number">03</div>
-                <h3>View Reports</h3>
-                <p>Get visual trend reports and stay on top of market movements</p>
+                <h3>查看报告</h3>
+                <p>获取可视化趋势报告，把握市场动向</p>
             </div>
         </div>
     </section>
 
+    <!-- Pricing Section -->
     <section class="pricing" id="pricing">
         <div class="section-header">
             <div class="section-label">PRICING</div>
-            <h2 class="section-title">Choose Your Plan</h2>
+            <h2 class="section-title">选择方案</h2>
         </div>
         
         <div class="pricing-grid">
             <div class="pricing-card">
                 <div class="pricing-name">STARTER</div>
-                <div class="price">$0<span>/month</span></div>
+                <div class="price">¥0<span>/月</span></div>
                 <ul class="pricing-features">
-                    <li>10 products per day</li>
-                    <li>Basic trend reports</li>
-                    <li>Email notifications</li>
-                    <li>Community support</li>
+                    <li>每日 10 个产品</li>
+                    <li>基础趋势报告</li>
+                    <li>邮件通知</li>
+                    <li>社区支持</li>
                 </ul>
-                <a href="#" class="pricing-cta">Get Started</a>
+                <a href="#" class="pricing-cta">开始使用</a>
             </div>
             
             <div class="pricing-card featured">
                 <div class="pricing-name">PROFESSIONAL</div>
-                <div class="price">$15<span>/month</span></div>
+                <div class="price">¥99<span>/月</span></div>
                 <ul class="pricing-features">
-                    <li>50+ products per day</li>
-                    <li>Advanced trend analysis</li>
-                    <li>Custom data sources</li>
-                    <li>API access</li>
-                    <li>Priority support</li>
+                    <li>每日 50+ 个产品</li>
+                    <li>高级趋势分析</li>
+                    <li>自定义数据源</li>
+                    <li>API 接入</li>
+                    <li>优先技术支持</li>
                 </ul>
-                <a href="#" class="pricing-cta">Subscribe Now</a>
+                <a href="#" class="pricing-cta">立即订阅</a>
             </div>
             
             <div class="pricing-card">
                 <div class="pricing-name">ENTERPRISE</div>
-                <div class="price">Custom</div>
+                <div class="price">定制</div>
                 <ul class="pricing-features">
-                    <li>Unlimited product tracking</li>
-                    <li>Private deployment</li>
-                    <li>Dedicated account manager</li>
-                    <li>SLA guarantee</li>
+                    <li>无限制产品追踪</li>
+                    <li>私有化部署</li>
+                    <li>专属客户经理</li>
+                    <li>SLA 保障</li>
                 </ul>
-                <a href="#" class="pricing-cta">Contact Sales</a>
+                <a href="#" class="pricing-cta">联系销售</a>
             </div>
         </div>
     </section>
 
+    <!-- CTA Section -->
     <section class="cta-section">
-        <h2>Start Tracking Product Trends</h2>
-        <p>Join thousands of product managers and entrepreneurs. Never miss a market opportunity.</p>
-        <a href="#pricing" class="cta-white">Start Free</a>
+        <h2>开始追踪产品趋势</h2>
+        <p>加入数千名产品经理和创业者的行列，不再错过任何市场机会。</p>
+        <a href="#pricing" class="cta-white">免费开始</a>
     </section>
 
+    <!-- Footer -->
     <footer>
-        <p>© 2026 TRENDTRACKER. Global Product Intelligence.</p>
+        <p>© 2026 TRENDTRACKER. 全球产品趋势雷达.</p>
     </footer>
 </body>
 </html>

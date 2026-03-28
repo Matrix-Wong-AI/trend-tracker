@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TrendTracker - Global Product Intelligence</title>
+    <title>TrendTracker - グローバル製品インテリジェンス</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -16,14 +16,13 @@
         }
         
         body {
-            font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Noto Sans JP", sans-serif;
             background: var(--paper);
             color: var(--ink);
             line-height: 1.8;
             letter-spacing: 0.02em;
         }
         
-        /* Language Switcher */
         .lang-switch {
             position: fixed;
             top: 20px;
@@ -100,7 +99,7 @@
         }
         
         .hero h1 {
-            font-size: 48px;
+            font-size: 44px;
             font-weight: 300;
             line-height: 1.4;
             margin-bottom: 30px;
@@ -123,9 +122,9 @@
         }
         
         .hero-subtitle {
-            font-size: 18px;
+            font-size: 17px;
             color: var(--stone);
-            max-width: 500px;
+            max-width: 520px;
             margin-bottom: 50px;
         }
         
@@ -219,7 +218,7 @@
         }
         
         .feature h3 {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 500;
             margin-bottom: 15px;
         }
@@ -399,7 +398,7 @@
         }
         
         @media (max-width: 768px) {
-            .hero h1 { font-size: 32px; }
+            .hero h1 { font-size: 28px; }
             .features-grid,
             .pricing-grid { grid-template-columns: 1fr; }
             .steps { flex-direction: column; }
@@ -411,38 +410,38 @@
 </head>
 <body>
     <div class="lang-switch">
-        <a href="index.html" class="active">EN</a>
+        <a href="index.html">EN</a>
         <a href="index-zh.html">中文</a>
-        <a href="index-ja.html">日本語</a>
+        <a href="index-ja.html" class="active">日本語</a>
     </div>
 
     <nav>
         <div class="logo">TRENDTRACKER</div>
         <div class="nav-links">
-            <a href="#features">Features</a>
-            <a href="#how">How It Works</a>
-            <a href="#pricing">Pricing</a>
+            <a href="#features">機能</a>
+            <a href="#how">使い方</a>
+            <a href="#pricing">料金</a>
         </div>
     </nav>
 
     <section class="hero">
         <div class="hero-badge">PRODUCT INTELLIGENCE</div>
-        <h1>Never Miss a<br><strong>Product Trend</strong></h1>
-        <p class="hero-subtitle">Automatically track trending products and discussions from Product Hunt, Reddit, and more. Generate multi-dimensional insights to stay ahead of the market.</p>
-        <a href="#pricing" class="cta-primary">Get Started</a>
+        <h1>トレンドを<br><strong>見逃さない</strong></h1>
+        <p class="hero-subtitle">Product Hunt、Redditなどから話題の製品と議論を自動収集。多角的な洞察レポートを生成し、市場の先を行く。</p>
+        <a href="#pricing" class="cta-primary">始める</a>
         
         <div class="hero-stats">
             <div class="stat">
                 <div class="stat-number">20+</div>
-                <div class="stat-label">Daily Products</div>
+                <div class="stat-label">1日の製品数</div>
             </div>
             <div class="stat">
                 <div class="stat-number">80+</div>
-                <div class="stat-label">Trending Discussions</div>
+                <div class="stat-label">話題の議論</div>
             </div>
             <div class="stat">
                 <div class="stat-number">8</div>
-                <div class="stat-label">Data Sources</div>
+                <div class="stat-label">データソース</div>
             </div>
         </div>
     </section>
@@ -450,24 +449,24 @@
     <section class="features" id="features">
         <div class="section-header">
             <div class="section-label">FEATURES</div>
-            <h2 class="section-title">Core Capabilities</h2>
+            <h2 class="section-title">主な機能</h2>
         </div>
         
         <div class="features-grid">
             <div class="feature">
                 <div class="feature-icon">◈</div>
-                <h3>Automated Data Collection</h3>
-                <p>Daily automated scraping of trending products and discussions from Product Hunt, Reddit, and more. No manual searching required.</p>
+                <h3>自動データ収集</h3>
+                <p>Product Hunt、Redditなどから話題の製品と議論を毎日自動収集。手動検索は不要。</p>
             </div>
             <div class="feature">
                 <div class="feature-icon">◉</div>
-                <h3>Multi-Dimensional Analysis</h3>
-                <p>AI-powered product categorization, vote trend analysis, discussion heat mapping, and emerging technology identification.</p>
+                <h3>多角的分析</h3>
+                <p>AIによる製品分類、投票トレンド分析、議論ヒートマップ、新興技術の特定。</p>
             </div>
             <div class="feature">
                 <div class="feature-icon">◎</div>
-                <h3>Visual Reports</h3>
-                <p>Generate beautiful HTML reports with dark theme support. Access trend insights anytime, anywhere.</p>
+                <h3>ビジュアルレポート</h3>
+                <p>美しいHTMLレポートを生成。ダークテーマ対応で、いつでもどこでも洞察にアクセス。</p>
             </div>
         </div>
     </section>
@@ -475,24 +474,24 @@
     <section class="how-it-works" id="how">
         <div class="section-header">
             <div class="section-label">HOW IT WORKS</div>
-            <h2 class="section-title">Three Simple Steps</h2>
+            <h2 class="section-title">3ステップで簡単</h2>
         </div>
         
         <div class="steps">
             <div class="step">
                 <div class="step-number">01</div>
-                <h3>Configure Sources</h3>
-                <p>Add your Product Hunt token, select Reddit communities to monitor</p>
+                <h3>ソース設定</h3>
+                <p>Product Huntトークンを追加、監視するRedditコミュニティを選択</p>
             </div>
             <div class="step">
                 <div class="step-number">02</div>
-                <h3>Auto Collection</h3>
-                <p>Daily scheduled scraping of latest products and trending discussions</p>
+                <h3>自動収集</h3>
+                <p>毎日定時に最新製品と話題の議論を収集</p>
             </div>
             <div class="step">
                 <div class="step-number">03</div>
-                <h3>View Reports</h3>
-                <p>Get visual trend reports and stay on top of market movements</p>
+                <h3>レポート閲覧</h3>
+                <p>ビジュアルトレンドレポートを取得、市場の動向を把握</p>
             </div>
         </div>
     </section>
@@ -500,57 +499,57 @@
     <section class="pricing" id="pricing">
         <div class="section-header">
             <div class="section-label">PRICING</div>
-            <h2 class="section-title">Choose Your Plan</h2>
+            <h2 class="section-title">料金プラン</h2>
         </div>
         
         <div class="pricing-grid">
             <div class="pricing-card">
                 <div class="pricing-name">STARTER</div>
-                <div class="price">$0<span>/month</span></div>
+                <div class="price">¥0<span>/月</span></div>
                 <ul class="pricing-features">
-                    <li>10 products per day</li>
-                    <li>Basic trend reports</li>
-                    <li>Email notifications</li>
-                    <li>Community support</li>
+                    <li>1日10製品</li>
+                    <li>基本トレンドレポート</li>
+                    <li>メール通知</li>
+                    <li>コミュニティサポート</li>
                 </ul>
-                <a href="#" class="pricing-cta">Get Started</a>
+                <a href="#" class="pricing-cta">始める</a>
             </div>
             
             <div class="pricing-card featured">
                 <div class="pricing-name">PROFESSIONAL</div>
-                <div class="price">$15<span>/month</span></div>
+                <div class="price">¥1,500<span>/月</span></div>
                 <ul class="pricing-features">
-                    <li>50+ products per day</li>
-                    <li>Advanced trend analysis</li>
-                    <li>Custom data sources</li>
-                    <li>API access</li>
-                    <li>Priority support</li>
+                    <li>1日50+製品</li>
+                    <li>高度トレンド分析</li>
+                    <li>カスタムデータソース</li>
+                    <li>APIアクセス</li>
+                    <li>優先サポート</li>
                 </ul>
-                <a href="#" class="pricing-cta">Subscribe Now</a>
+                <a href="#" class="pricing-cta">今すぐ登録</a>
             </div>
             
             <div class="pricing-card">
                 <div class="pricing-name">ENTERPRISE</div>
-                <div class="price">Custom</div>
+                <div class="price">お問い合わせ</div>
                 <ul class="pricing-features">
-                    <li>Unlimited product tracking</li>
-                    <li>Private deployment</li>
-                    <li>Dedicated account manager</li>
-                    <li>SLA guarantee</li>
+                    <li>無制限製品追跡</li>
+                    <li>プライベート展開</li>
+                    <li>専任アカウントマネージャー</li>
+                    <li>SLA保証</li>
                 </ul>
-                <a href="#" class="pricing-cta">Contact Sales</a>
+                <a href="#" class="pricing-cta">営業に問い合わせ</a>
             </div>
         </div>
     </section>
 
     <section class="cta-section">
-        <h2>Start Tracking Product Trends</h2>
-        <p>Join thousands of product managers and entrepreneurs. Never miss a market opportunity.</p>
-        <a href="#pricing" class="cta-white">Start Free</a>
+        <h2>製品トレンドの追跡を始める</h2>
+        <p>何千ものプロダクトマネージャーと起業家に参加。市場の機会を見逃さない。</p>
+        <a href="#pricing" class="cta-white">無料で始める</a>
     </section>
 
     <footer>
-        <p>© 2026 TRENDTRACKER. Global Product Intelligence.</p>
+        <p>© 2026 TRENDTRACKER. グローバル製品インテリジェンス。</p>
     </footer>
 </body>
 </html>

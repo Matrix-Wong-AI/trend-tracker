@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKILL DEV LOG - trend-tracker</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "SF Pro Display", sans-serif;
+            background: #fff;
+            color: #000;
+            line-height: 1.5;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+        
+        /* 顶部通栏 */
+        .header {
+            background: #000;
+            color: #fff;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #ff2d2d;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .header-time {
+            font-size: 13px;
+            color: #888;
+            font-family: "SF Mono", Monaco, monospace;
+        }
+        
+        /* 内容区 */
+        .content {
+            padding: 20px 16px;
+        }
+        
+        /* 大数字章节 */
+        .section {
+            margin-bottom: 32px;
+        }
+        .section-header {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .section-number {
+            font-size: 48px;
+            font-weight: 800;
+            color: #ff2d2d;
+            line-height: 1;
+        }
+        .section-tag {
+            background: #000;
+            color: #fff;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+        
+        /* 四格规划 */
+        .grid-2x2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1px;
+            background: #e0e0e0;
+            border: 1px solid #e0e0e0;
+        }
+        .grid-item {
+            background: #fff;
+            padding: 16px 12px;
+        }
+        .grid-label {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .grid-value {
+            font-size: 15px;
+            font-weight: 600;
+        }
+        
+        /* 红色时间线 */
+        .timeline {
+            position: relative;
+            padding-left: 20px;
+        }
+        .timeline::before {
+            content: "";
+            position: absolute;
+            left: 4px;
+            top: 4px;
+            bottom: 4px;
+            width: 2px;
+            background: #ff2d2d;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .timeline-item::before {
+            content: "";
+            position: absolute;
+            left: -18px;
+            top: 4px;
+            width: 8px;
+            height: 8px;
+            background: #ff2d2d;
+            border-radius: 50%;
+        }
+        .timeline-time {
+            font-size: 12px;
+            color: #ff2d2d;
+            font-family: "SF Mono", Monaco, monospace;
+            font-weight: 600;
+        }
+        .timeline-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin: 2px 0;
+        }
+        .timeline-desc {
+            font-size: 13px;
+            color: #555;
+        }
+        
+        /* 黑色标签 */
+        .round-tag {
+            background: #000;
+            color: #fff;
+            padding: 10px 14px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .round-dot {
+            width: 6px;
+            height: 6px;
+            background: #ff2d2d;
+            border-radius: 50%;
+        }
+        .round-text {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+        
+        /* 问题/解决卡片 */
+        .problem-card {
+            background: #f5f5f5;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+        .problem-label {
+            font-size: 11px;
+            color: #ff2d2d;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .problem-text {
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .solution-text {
+            font-size: 13px;
+            color: #555;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed #ccc;
+        }
+        
+        /* 黑底结果卡 */
+        .result-card {
+            background: #000;
+            color: #fff;
+            padding: 20px 16px;
+        }
+        .result-title {
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+        .result-stats {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 20px;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 36px;
+            font-weight: 800;
+            color: #ff2d2d;
+            line-height: 1;
+        }
+        .stat-label {
+            font-size: 11px;
+            color: #888;
+            margin-top: 4px;
+        }
+        .deliverables {
+            border-top: 1px solid #333;
+            padding-top: 16px;
+        }
+        .deliverable-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+        .check {
+            color: #ff2d2d;
+            font-weight: bold;
+        }
+        
+        /* 金句 */
+        .quote {
+            background: #f5f5f5;
+            padding: 20px 16px;
+            margin-top: 20px;
+            border-left: 3px solid #ff2d2d;
+        }
+        .quote-text {
+            font-size: 14px;
+            font-weight: 600;
+            font-style: italic;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部通栏 -->
+    <div class="header">
+        <div class="header-left">
+            <div class="status-dot"></div>
+            <span>SKILL DEV LOG</span>
+        </div>
+        <div class="header-time">07:03 → 15:28</div>
+    </div>
+    
+    <div class="content">
+        <!-- 01 INIT -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-number">01</div>
+                <div>
+                    <div class="section-tag">INIT</div>
+                    <div class="section-title">trend-tracker</div>
+                </div>
+            </div>            
+            <p style="font-size: 14px; color: #555; margin-bottom: 16px;">
+                自动挖掘 Reddit、Product Hunt 热门产品，生成可视化追踪报告
+            </p>
+        </div>
+        
+        <!-- 02 TIMELINE -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-number">02</div>
+                <div>
+                    <div class="section-tag">TIMELINE</div>
+                    <div class="section-title">狩猎时刻</div>
+                </div>
+            </div>
+            
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-time">07:03</div>
+                    <div class="timeline-title">发现猎物</div>
+                    <div class="timeline-desc">虚空在低语，需求浮现</div>
+                </div>                
+                <div class="timeline-item">
+                    <div class="timeline-time">07:04</div>
+                    <div class="timeline-title">构筑巢穴</div>
+                    <div class="timeline-desc">编织 Skill 框架，5个脚本就位</div>
+                </div>                
+                <div class="timeline-item">
+                    <div class="timeline-time">07:59</div>
+                    <div class="timeline-title">第一次反击</div>
+                    <div class="timeline-desc">PH API 失效，触手被弹回</div>
+                </div>                
+                <div class="timeline-item">
+                    <div class="timeline-time">09:12</div>
+                    <div class="timeline-title">第二次反击</div>
+                    <div class="timeline-desc">Reddit 403 利爪，伪装被识破</div>
+                </div>                
+                <div class="timeline-item">
+                    <div class="timeline-time">09:16</div>
+                    <div class="timeline-title">进化：Token 之路</div>
+                    <div class="timeline-desc">获取 PH Developer Token，解锁完整数据</div>
+                </div>                
+                <div class="timeline-item">
+                    <div class="timeline-time">14:35</div>
+                    <div class="timeline-title">第三次反击</div>
+                    <div class="timeline-desc">Reddit OAuth 封印，祭坛大门关闭</div>
+                </div>                
+                <div class="timeline-item">
+                    <div class="timeline-time">15:20</div>
+                    <div class="timeline-title">进食完成</div>
+                    <div class="timeline-desc">打包成 .skill 茧，13KB</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 03 ITERATION -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-number">03</div>
+                <div>
+                    <div class="section-tag">ITERATION</div>
+                    <div class="section-title">适应与进化</div>
+                </div>
+            </div>            
+            <div class="round-tag">
+                <div class="round-dot"></div>
+                <div class="round-text">ROUND 1: API 层 - PH GraphQL 失效</div>
+            </div>            
+            <div class="problem-card">
+                <div class="problem-label">TRAP TRIGGERED</div>
+                <div class="problem-text">API 返回空数据，GraphQL 端点已变异</div>
+                <div class="solution-text">✓ 撕裂外壳，从 RSS feed 提取 20 个猎物名字</div>
+            </div>            
+            <div class="round-tag">
+                <div class="round-dot"></div>
+                <div class="round-text">ROUND 2: 认证层 - Reddit 403 封锁</div>
+            </div>            
+            <div class="problem-card">
+                <div class="problem-label">TRAP TRIGGERED</div>
+                <div class="problem-text">403 Client Error: Blocked，User-Agent 被标记</div>
+                <div class="solution-text">✓ 褪去旧皮，换上 Safari 伪装；撤退不是耻辱</div>
+            </div>            
+            <div class="round-tag">
+                <div class="round-dot"></div>
+                <div class="round-text">ROUND 3: 数据层 - Reddit OAuth 封印</div>
+            </div>            
+            <div class="problem-card">
+                <div class="problem-label">TRAP TRIGGERED</div>
+                <div class="problem-text">Reddit 不让申请 app 了，祭坛大门封印</div>
+                <div class="solution-text">✓ 回归本能，从 RSS feed 提取 80 条猎物低语</div>
+            </div>
+        </div>
+        
+        <!-- 04 RESULT -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-number">04</div>
+                <div>
+                    <div class="section-tag">RESULT</div>
+                    <div class="section-title">猎杀完成</div>
+                </div>
+            </div>            
+            <div class="result-card">
+                <div class="result-title">✓ 猎物状态：已捕获，已消化，已进化</div>                
+                <div class="result-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">8h25m</div>
+                        <div class="stat-label">时长</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">3</div>
+                        <div class="stat-label">轮次</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">5</div>
+                        <div class="stat-label">脚本</div>
+                    </div>
+                </div>                
+                <div class="deliverables">
+                    <div class="deliverable-item">
+                        <span class="check">✓</span>
+                        <span>trend-tracker.skill (13KB)</span>
+                    </div>
+                    <div class="deliverable-item">
+                        <span class="check">✓</span>
+                        <span>PH API 抓取（Token 认证）</span>
+                    </div>
+                    <div class="deliverable-item">
+                        <span class="check">✓</span>
+                        <span>Reddit RSS 抓取（免认证）</span>
+                    </div>
+                    <div class="deliverable-item">
+                        <span class="check">✓</span>
+                        <span>可视化 HTML 报告（深色主题）</span>
+                    </div>
+                    <div class="deliverable-item">
+                        <span class="check">✓</span>
+                        <span>网站来源链接（可追溯）</span>
+                    </div>
+                </div>
+            </div>            
+            <div class="quote">
+                <div class="quote-text">
+                    "虚空不怜悯弱者，但奖励适应者。Token 是钥匙，RSS 是本能，而猎手的触手，永远比屏障多一根。"
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

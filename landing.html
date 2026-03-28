@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrendTracker - 全球产品趋势雷达</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --ink: #1a1a1a;
+            --paper: #faf9f7;
+            --stone: #8c8c8c;
+            --mist: #e8e6e3;
+            --vermillion: #c45c48;
+            --indigo: #4a5568;
+        }
+        
+        body {
+            font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Noto Sans JP", sans-serif;
+            background: var(--paper);
+            color: var(--ink);
+            line-height: 1.8;
+            letter-spacing: 0.02em;
+        }
+        
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(250, 249, 247, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid var(--mist);
+        }
+        
+        .logo {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 40px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--stone);
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--ink);
+        }
+        
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 120px 40px 80px;
+            position: relative;
+        }
+        
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(196, 92, 72, 0.03) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        
+        .hero-badge {
+            font-size: 12px;
+            color: var(--vermillion);
+            letter-spacing: 0.2em;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .hero-badge::before {
+            content: "";
+            width: 20px;
+            height: 1px;
+            background: var(--vermillion);
+        }
+        
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 300;
+            line-height: 1.4;
+            margin-bottom: 30px;
+            letter-spacing: 0.05em;
+        }
+        
+        .hero h1 strong {
+            font-weight: 600;
+            position: relative;
+        }
+        
+        .hero h1 strong::after {
+            content: "";
+            position: absolute;
+            bottom: 5px;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: rgba(196, 92, 72, 0.15);
+            z-index: -1;
+        }
+        
+        .hero-subtitle {
+            font-size: 18px;
+            color: var(--stone);
+            max-width: 500px;
+            margin-bottom: 50px;
+        }
+        
+        .cta-primary {
+            background: var(--ink);
+            color: var(--paper);
+            padding: 18px 48px;
+            font-size: 14px;
+            letter-spacing: 0.15em;
+            text-decoration: none;
+            transition: all 0.4s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .cta-primary:hover {
+            background: var(--vermillion);
+            transform: translateY(-2px);
+        }
+        
+        .hero-stats {
+            display: flex;
+            gap: 60px;
+            margin-top: 80px;
+            padding-top: 40px;
+            border-top: 1px solid var(--mist);
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 36px;
+            font-weight: 300;
+            color: var(--ink);
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: var(--stone);
+            letter-spacing: 0.1em;
+            margin-top: 5px;
+        }
+        
+        /* Section Common */
+        section {
+            padding: 120px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+        
+        .section-label {
+            font-size: 11px;
+            color: var(--vermillion);
+            letter-spacing: 0.3em;
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 32px;
+            font-weight: 300;
+            letter-spacing: 0.05em;
+        }
+        
+        /* Features */
+        .features {
+            background: white;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 60px;
+        }
+        
+        .feature {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 30px;
+            border: 1px solid var(--mist);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .feature h3 {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            letter-spacing: 0.05em;
+        }
+        
+        .feature p {
+            font-size: 14px;
+            color: var(--stone);
+            line-height: 1.8;
+        }
+        
+        /* How It Works */
+        .how-it-works {
+            background: var(--paper);
+        }
+        
+        .steps {
+            display: flex;
+            justify-content: space-between;
+            gap: 40px;
+        }
+        
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+        
+        .step:not(:last-child)::after {
+            content: "";
+            position: absolute;
+            top: 30px;
+            right: -20px;
+            width: 40px;
+            height: 1px;
+            background: var(--mist);
+        }
+        
+        .step-number {
+            font-size: 48px;
+            font-weight: 100;
+            color: var(--vermillion);
+            opacity: 0.3;
+            margin-bottom: 20px;
+        }
+        
+        .step h3 {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        
+        .step p {
+            font-size: 13px;
+            color: var(--stone);
+        }
+        
+        /* Pricing */
+        .pricing {
+            background: white;
+        }
+        
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .pricing-card {
+            border: 1px solid var(--mist);
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s;
+        }
+        
+        .pricing-card:hover {
+            border-color: var(--ink);
+            transform: translateY(-5px);
+        }
+        
+        .pricing-card.featured {
+            border-color: var(--ink);
+            background: var(--ink);
+            color: var(--paper);
+        }
+        
+        .pricing-card.featured .price,
+        .pricing-card.featured .pricing-features li {
+            color: var(--paper);
+        }
+        
+        .pricing-name {
+            font-size: 12px;
+            letter-spacing: 0.2em;
+            margin-bottom: 20px;
+            color: var(--stone);
+        }
+        
+        .pricing-card.featured .pricing-name {
+            color: var(--vermillion);
+        }
+        
+        .price {
+            font-size: 42px;
+            font-weight: 300;
+            margin-bottom: 30px;
+        }
+        
+        .price span {
+            font-size: 14px;
+            color: var(--stone);
+        }
+        
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+        
+        .pricing-features li {
+            font-size: 13px;
+            padding: 10px 0;
+            color: var(--stone);
+            border-bottom: 1px solid var(--mist);
+        }
+        
+        .pricing-card.featured .pricing-features li {
+            border-bottom-color: rgba(255,255,255,0.1);
+        }
+        
+        .pricing-features li:last-child {
+            border-bottom: none;
+        }
+        
+        .pricing-cta {
+            display: inline-block;
+            padding: 12px 30px;
+            font-size: 12px;
+            letter-spacing: 0.15em;
+            text-decoration: none;
+            border: 1px solid var(--ink);
+            color: var(--ink);
+            transition: all 0.3s;
+        }
+        
+        .pricing-card.featured .pricing-cta {
+            border-color: var(--paper);
+            color: var(--paper);
+        }
+        
+        .pricing-cta:hover {
+            background: var(--ink);
+            color: var(--paper);
+        }
+        
+        .pricing-card.featured .pricing-cta:hover {
+            background: var(--paper);
+            color: var(--ink);
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            background: var(--ink);
+            color: var(--paper);
+            text-align: center;
+            padding: 100px 40px;
+        }
+        
+        .cta-section h2 {
+            font-size: 28px;
+            font-weight: 300;
+            margin-bottom: 20px;
+            letter-spacing: 0.05em;
+        }
+        
+        .cta-section p {
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 40px;
+        }
+        
+        .cta-white {
+            background: var(--paper);
+            color: var(--ink);
+            padding: 18px 48px;
+            font-size: 14px;
+            letter-spacing: 0.15em;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.4s;
+        }
+        
+        .cta-white:hover {
+            background: var(--vermillion);
+            color: var(--paper);
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--paper);
+            padding: 60px 40px;
+            text-align: center;
+            border-top: 1px solid var(--mist);
+        }
+        
+        footer p {
+            font-size: 12px;
+            color: var(--stone);
+            letter-spacing: 0.1em;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 32px; }
+            .features-grid,
+            .pricing-grid { grid-template-columns: 1fr; }
+            .steps { flex-direction: column; }
+            .step:not(:last-child)::after { display: none; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">TRENDTRACKER</div>
+        <div class="nav-links">
+            <a href="#features">功能</a>
+            <a href="#how">使用方法</a>
+            <a href="#pricing">定价</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-badge">PRODUCT INTELLIGENCE</div>
+        <h1>不再错过任何<br><strong>产品趋势</strong></h1>
+        <p class="hero-subtitle">自动追踪 Product Hunt、Reddit 等平台的最新产品动态，生成多维度洞察报告，助你把握市场先机。</p>
+        <a href="#pricing" class="cta-primary">开始使用</a>
+        
+        <div class="hero-stats">
+            <div class="stat">
+                <div class="stat-number">20+</div>
+                <div class="stat-label">每日产品</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">80+</div>
+                <div class="stat-label">热门讨论</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">8</div>
+                <div class="stat-label">数据源</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="section-header">
+            <div class="section-label">FEATURES</div>
+            <h2 class="section-title">核心功能</h2>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature">
+                <div class="feature-icon">◈</div>
+                <h3>自动数据采集</h3>
+                <p>每日自动抓取 Product Hunt、Reddit 等平台的热门产品和讨论，无需手动搜索。</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">◉</div>
+                <h3>多维度分析</h3>
+                <p>AI 智能分类产品类型，分析投票趋势、讨论热度，识别新兴技术方向。</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">◎</div>
+                <h3>可视化报告</h3>
+                <p>生成精美的 HTML 报告，支持深色主题，随时随地查看趋势洞察。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works" id="how">
+        <div class="section-header">
+            <div class="section-label">HOW IT WORKS</div>
+            <h2 class="section-title">简单三步</h2>
+        </div>
+        
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">01</div>
+                <h3>配置数据源</h3>
+                <p>添加 Product Hunt Token，选择关注的 Reddit 板块</p>
+            </div>
+            <div class="step">
+                <div class="step-number">02</div>
+                <h3>自动采集</h3>
+                <p>每日定时抓取最新产品和热门讨论</p>
+            </div>
+            <div class="step">
+                <div class="step-number">03</div>
+                <h3>查看报告</h3>
+                <p>获取可视化趋势报告，把握市场动向</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing" id="pricing">
+        <div class="section-header">
+            <div class="section-label">PRICING</div>
+            <h2 class="section-title">选择方案</h2>
+        </div>
+        
+        <div class="pricing-grid">
+            <div class="pricing-card">
+                <div class="pricing-name">STARTER</div>
+                <div class="price">¥0<span>/月</span></div>
+                <ul class="pricing-features">
+                    <li>每日 10 个产品</li>
+                    <li>基础趋势报告</li>
+                    <li>邮件通知</li>
+                    <li>社区支持</li>
+                </ul>
+                <a href="#" class="pricing-cta">开始使用</a>
+            </div>
+            
+            <div class="pricing-card featured">
+                <div class="pricing-name">PROFESSIONAL</div>
+                <div class="price">¥99<span>/月</span></div>
+                <ul class="pricing-features">
+                    <li>每日 50+ 个产品</li>
+                    <li>高级趋势分析</li>
+                    <li>自定义数据源</li>
+                    <li>API 接入</li>
+                    <li>优先技术支持</li>
+                </ul>
+                <a href="#" class="pricing-cta">立即订阅</a>
+            </div>
+            
+            <div class="pricing-card">
+                <div class="pricing-name">ENTERPRISE</div>
+                <div class="price">定制</div>
+                <ul class="pricing-features">
+                    <li>无限制产品追踪</li>
+                    <li>私有化部署</li>
+                    <li>专属客户经理</li>
+                    <li>SLA 保障</li>
+                </ul>
+                <a href="#" class="pricing-cta">联系销售</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <h2>开始追踪产品趋势</h2>
+        <p>加入数千名产品经理和创业者的行列，不再错过任何市场机会。</p>
+        <a href="#pricing" class="cta-white">免费开始</a>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2026 TRENDTRACKER. 全球产品趋势雷达.</p>
+    </footer>
+</body>
+</html>

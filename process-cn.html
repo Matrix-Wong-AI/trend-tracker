@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrendTracker — 开发过程记录</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pure-white: #ffffff;
+            --off-white: #fafafa;
+            --light-gray: #e8e8e8;
+            --mid-gray: #999999;
+            --dark-gray: #555555;
+            --charcoal: #222222;
+            --pure-black: #111111;
+            --accent: #e74c3c;
+            --accent-light: #ffebee;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--pure-white);
+            color: var(--charcoal);
+            line-height: 1.7;
+            font-weight: 400;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 20px;
+            }
+        }
+        
+        /* Header */
+        header {
+            padding: 60px 0 40px;
+            border-bottom: 1px solid var(--light-gray);
+            position: relative;
+        }
+        
+        .header-geometry {
+            position: absolute;
+            right: 40px;
+            top: 60px;
+            width: 120px;
+            height: 120px;
+        }
+        
+        .header-geometry svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .project-label {
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            color: var(--mid-gray);
+            margin-bottom: 16px;
+        }
+        
+        h1 {
+            font-size: 42px;
+            font-weight: 300;
+            letter-spacing: 0.05em;
+            color: var(--pure-black);
+            margin-bottom: 24px;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            color: var(--dark-gray);
+            max-width: 400px;
+        }
+        
+        .meta-bar {
+            display: flex;
+            gap: 40px;
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 1px solid var(--light-gray);
+        }
+        
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .meta-label {
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            color: var(--mid-gray);
+            text-transform: uppercase;
+        }
+        
+        .meta-value {
+            font-size: 14px;
+            color: var(--charcoal);
+            font-weight: 500;
+        }
+        
+        /* Section */
+        section {
+            padding: 60px 0;
+            border-bottom: 1px solid var(--light-gray);
+        }
+        
+        .section-title {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            color: var(--mid-gray);
+            margin-bottom: 32px;
+            text-transform: uppercase;
+        }
+        
+        /* Stats Grid */
+        .stats-visual {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0;
+            border: 1px solid var(--light-gray);
+        }
+        
+        .stat-block {
+            padding: 32px 24px;
+            text-align: center;
+            border-right: 1px solid var(--light-gray);
+            position: relative;
+        }
+        
+        .stat-block:last-child {
+            border-right: none;
+        }
+        
+        .stat-icon {
+            width: 32px;
+            height: 32px;
+            margin: 0 auto 16px;
+        }
+        
+        .stat-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .stat-number {
+            font-size: 36px;
+            font-weight: 300;
+            color: var(--pure-black);
+            margin-bottom: 4px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: var(--mid-gray);
+        }
+        
+        @media (max-width: 768px) {
+            .stats-visual {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .stat-block:nth-child(2) {
+                border-right: none;
+            }
+            .stat-block:nth-child(1),
+            .stat-block:nth-child(2) {
+                border-bottom: 1px solid var(--light-gray);
+            }
+        }
+        
+        /* Timeline */
+        .timeline-container {
+            position: relative;
+            padding-left: 80px;
+        }
+        
+        .timeline-line {
+            position: absolute;
+            left: 24px;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: var(--light-gray);
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding: 24px 0;
+            border-bottom: 1px solid var(--off-white);
+        }
+        
+        .timeline-item:last-child {
+            border-bottom: none;
+        }
+        
+        .time-badge {
+            position: absolute;
+            left: -72px;
+            top: 26px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--mid-gray);
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .timeline-dot {
+            position: absolute;
+            left: -60px;
+            top: 28px;
+            width: 10px;
+            height: 10px;
+            background: var(--pure-white);
+            border: 2px solid var(--charcoal);
+            border-radius: 50%;
+        }
+        
+        .timeline-item.highlight .timeline-dot {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+        
+        .timeline-content h3 {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--pure-black);
+            margin-bottom: 6px;
+        }
+        
+        .timeline-content p {
+            font-size: 14px;
+            color: var(--dark-gray);
+            line-height: 1.6;
+        }
+        
+        .status-tag {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            padding: 4px 10px;
+            margin-top: 12px;
+            border-radius: 2px;
+        }
+        
+        .tag-issue {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+        
+        .tag-resolved {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .tag-normal {
+            background: var(--off-white);
+            color: var(--dark-gray);
+        }
+        
+        /* Challenge Cards */
+        .challenge-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        
+        .challenge-card {
+            border: 1px solid var(--light-gray);
+            padding: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .challenge-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--charcoal);
+        }
+        
+        .challenge-card.highlight::before {
+            background: var(--accent);
+        }
+        
+        .challenge-num {
+            font-size: 32px;
+            font-weight: 200;
+            color: var(--light-gray);
+            margin-bottom: 16px;
+        }
+        
+        .challenge-title {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--pure-black);
+            margin-bottom: 12px;
+        }
+        
+        .challenge-solution {
+            font-size: 13px;
+            color: var(--dark-gray);
+            line-height: 1.6;
+        }
+        
+        @media (max-width: 768px) {
+            .challenge-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Deliverables */
+        .deliverable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            background: var(--light-gray);
+            border: 1px solid var(--light-gray);
+        }
+        
+        .deliverable-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px 24px;
+            background: var(--pure-white);
+        }
+        
+        .deliverable-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--off-white);
+        }
+        
+        .deliverable-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .deliverable-info {
+            flex: 1;
+        }
+        
+        .deliverable-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--pure-black);
+            margin-bottom: 2px;
+        }
+        
+        .deliverable-desc {
+            font-size: 12px;
+            color: var(--mid-gray);
+        }
+        
+        .deliverable-meta {
+            font-size: 12px;
+            color: var(--mid-gray);
+            text-align: right;
+        }
+        
+        /* Quote */
+        .quote-section {
+            background: var(--off-white);
+            padding: 80px 0;
+            text-align: center;
+            position: relative;
+        }
+        
+        .quote-geometry {
+            position: absolute;
+            left: 40px;
+            bottom: 40px;
+            width: 80px;
+            height: 80px;
+            opacity: 0.1;
+        }
+        
+        .quote-geometry svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        blockquote {
+            font-size: 22px;
+            font-weight: 300;
+            line-height: 1.7;
+            max-width: 600px;
+            margin: 0 auto;
+            color: var(--charcoal);
+        }
+        
+        blockquote footer {
+            margin-top: 24px;
+            font-size: 13px;
+            color: var(--mid-gray);
+        }
+        
+        /* Footer */
+        footer {
+            padding: 40px 0;
+            text-align: center;
+        }
+        
+        footer p {
+            font-size: 12px;
+            color: var(--mid-gray);
+            letter-spacing: 0.05em;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-geometry">
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="48" stroke="#e8e8e8" stroke-width="1"/>
+                    <circle cx="50" cy="50" r="30" stroke="#e8e8e8" stroke-width="1"/>
+                    <circle cx="50" cy="50" r="12" fill="#111"/>
+                </svg>
+            </div>
+            
+            <div class="project-label">项目文档 / PROJECT 001</div>
+            <h1>TrendTracker</h1>
+            <p class="subtitle">自动追踪 Reddit、Product Hunt 等产品趋势，生成多维度洞察报告</p>
+            
+            <div class="meta-bar">
+                <div class="meta-item">
+                    <span class="meta-label">开发周期</span>
+                    <span class="meta-value">2026.03.28</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">时间范围</span>
+                    <span class="meta-value">07:03 — 17:27</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">总耗时</span>
+                    <span class="meta-value">10小时24分</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section>
+        <div class="container">
+            <div class="section-title">关键指标</div>
+            
+            <div class="stats-visual">
+                <div class="stat-block">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12,6 12,12 16,14"/>
+                        </svg>
+                    </div>
+                    <div class="stat-number">10h</div>
+                    <div class="stat-label">总开发时长</div>
+                </div>
+                
+                <div class="stat-block">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/>
+                            <line x1="8" y1="8" x2="8" y2="16"/>
+                            <line x1="12" y1="6" x2="12" y2="18"/>
+                            <line x1="16" y1="10" x2="16" y2="14"/>
+                        </svg>
+                    </div>
+                    <div class="stat-number">5</div>
+                    <div class="stat-label">核心脚本</div>
+                </div>
+                
+                <div class="stat-block">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <polygon points="12,2 22,8.5 22,15.5 12,22 2,15.5 2,8.5"/>
+                            <line x1="12" y1="8" x2="12" y2="16"/>
+                            <line x1="8" y1="12" x2="16" y2="12"/>
+                        </svg>
+                    </div>
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">重大挑战</div>
+                </div>
+                
+                <div class="stat-block">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <rect x="4" y="4" width="16" height="16" rx="2"/>
+                            <polyline points="8,12 11,15 16,9"/>
+                        </svg>
+                    </div>
+                    <div class="stat-number">13KB</div>
+                    <div class="stat-label">最终体积</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <div class="section-title">开发时间线</div>
+            
+            <div class="timeline-container">
+                <div class="timeline-line"></div>
+                
+                <div class="timeline-item">
+                    <span class="time-badge">07:03</span>
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>项目启动</h3>
+                        <p>需求确认：自动抓取 Reddit、Product Hunt 热门产品，生成可视化分析报告</p>
+                        <span class="status-tag tag-normal">启动</span>
+                    </div>
+                </div>
+                
+                <div class="timeline-item highlight">
+                    <span class="time-badge">07:59</span>
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>挑战 01：Product Hunt API 失效</h3>
+                        <p>GraphQL API 返回空数据，旧接口已失效。临时切换到 RSS feed 获取基础数据</p>
+                        <span class="status-tag tag-issue">问题</span>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <span class="time-badge">09:16</span>
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>解决：Token 认证方案</h3>
+                        <p>获取 Product Hunt Developer Token，解锁完整数据访问：投票数、评论数、标签、缩略图</p>
+                        <span class="status-tag tag-resolved">已解决</span>
+                    </div>
+                </div>
+                
+                <div class="timeline-item highlight">
+                    <span class="time-badge">09:12</span>
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>挑战 02：Reddit 403 封锁</h3>
+                        <p>Reddit 识别并封锁请求，User-Agent 被标记，所有 API 路径返回 403</p>
+                        <span class="status-tag tag-issue">问题</span>
+                    </div>
+                </div>
+                
+                <div class="timeline-item highlight">
+                    <span class="time-badge">14:35</span>
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>挑战 03：Reddit OAuth 关闭</h3>
+                        <p>Reddit 已关闭新应用申请，OAuth 路径被封印。采用 RSS feed 作为最终方案</p>
+                        <span class="status-tag tag-issue">问题</span>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <span class="time-badge">15:20</span>
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>Skill 打包完成</h3>
+                        <p>生成 trend-tracker.skill (13KB)，包含 5 个脚本、配置文件和完整文档</p>
+                        <span class="status-tag tag-normal">交付</span>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <span class="time-badge">15:28</span>
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>可视化页面</h3>
+                        <p>创建 Skill 开发流程可视化页面，采用紧凑杂志风格设计</p>
+                        <span class="status-tag tag-normal">设计</span>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <span class="time-badge">16:55</span>
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3>商业化落地页</h3>
+                        <p>制作日式简约风格商业化页面，包含 EN/中文/日本語 三语版本</p>
+                        <span class="status-tag tag-normal">上线</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <div class="section-title">挑战与解决方案</div>
+            
+            <div class="challenge-grid">
+                <div class="challenge-card">
+                    <div class="challenge-num">01</div>
+                    <div class="challenge-title">Product Hunt API 失效</div>
+                    <div class="challenge-solution"><strong>解决方案：</strong>采用 Token 认证机制，通过 Developer API 获取完整数据访问权限，包括投票数、评论数和标签</div>
+                </div>
+                
+                <div class="challenge-card highlight">
+                    <div class="challenge-num">02</div>
+                    <div class="challenge-title">Reddit 403 封锁</div>
+                    <div class="challenge-solution"><strong>解决方案：</strong>尝试多种 User-Agent 轮换均被封锁，最终切换至 RSS feed 方案，无需认证即可稳定获取数据</div>
+                </div>
+                
+                <div class="challenge-card highlight">
+                    <div class="challenge-num">03</div>
+                    <div class="challenge-title">Reddit OAuth 关闭</div>
+                    <div class="challenge-solution"><strong>解决方案：</strong>Reddit 已停止新应用申请，祭坛大门永久封印。RSS feed 成为唯一可行路径，成功抓取 8 个板块共 80 条讨论</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <div class="section-title">交付物清单</div>
+            
+            <div class="deliverable-list">
+                <div class="deliverable-row">
+                    <div class="deliverable-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <rect x="4" y="4" width="16" height="16" rx="2"/>
+                            <polyline points="8,12 11,15 16,9"/>
+                        </svg>
+                    </div>
+                    <div class="deliverable-info">
+                        <div class="deliverable-name">trend-tracker.skill</div>
+                        <div class="deliverable-desc">可分发 Skill 包</div>
+                    </div>
+                    <div class="deliverable-meta">13KB</div>
+                </div>
+                
+                <div class="deliverable-row">
+                    <div class="deliverable-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                        </svg>
+                    </div>
+                    <div class="deliverable-info">
+                        <div class="deliverable-name">PH API 集成</div>
+                        <div class="deliverable-desc">Token 认证方式</div>
+                    </div>
+                    <div class="deliverable-meta">完整数据</div>
+                </div>
+                
+                <div class="deliverable-row">
+                    <div class="deliverable-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                            <polyline points="22,6 12,13 2,6"/>
+                        </svg>
+                    </div>
+                    <div class="deliverable-info">
+                        <div class="deliverable-name">Reddit RSS 抓取</div>
+                        <div class="deliverable-desc">免认证方案</div>
+                    </div>
+                    <div class="deliverable-meta">80条数据</div>
+                </div>
+                
+                <div class="deliverable-row">
+                    <div class="deliverable-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                            <line x1="8" y1="21" x2="16" y2="21"/>
+                            <line x1="12" y1="17" x2="12" y2="21"/>
+                        </svg>
+                    </div>
+                    <div class="deliverable-info">
+                        <div class="deliverable-name">可视化报告</div>
+                        <div class="deliverable-desc">深色主题 HTML</div>
+                    </div>
+                    <div class="deliverable-meta">响应式</div>
+                </div>
+                
+                <div class="deliverable-row">
+                    <div class="deliverable-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <polygon points="12,2 22,8.5 22,15.5 12,22 2,15.5 2,8.5"/>
+                            <polyline points="12,6 12,12 16,10"/>
+                        </svg>
+                    </div>
+                    <div class="deliverable-info">
+                        <div class="deliverable-name">Skill 可视化页面</div>
+                        <div class="deliverable-desc">杂志风格设计</div>
+                    </div>
+                    <div class="deliverable-meta">开发记录</div>
+                </div>
+                
+                <div class="deliverable-row">
+                    <div class="deliverable-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <line x1="3" y1="9" x2="21" y2="9"/>
+                            <line x1="9" y1="21" x2="9" y2="9"/>
+                        </svg>
+                    </div>
+                    <div class="deliverable-info">
+                        <div class="deliverable-name">商业化落地页</div>
+                        <div class="deliverable-desc">日式简约风格</div>
+                    </div>
+                    <div class="deliverable-meta">三语版本</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="quote-section">
+        <div class="container">
+            <div class="quote-geometry">
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="10" y="10" width="80" height="80" stroke="#111" stroke-width="1"/>
+                    <rect x="25" y="25" width="50" height="50" stroke="#111" stroke-width="1"/>
+                    <circle cx="50" cy="50" r="15" stroke="#111" stroke-width="1"/>
+                </svg>
+            </div>
+            
+            <blockquote>
+                Token 是钥匙，RSS 是本能。
+                <footer>—— 迪特拉姆斯原则在数据架构中的应用</footer>
+            </blockquote>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 TrendTracker 开发文档 — 简约设计</p>
+        </div>
+    </footer>
+</body>
+</html>

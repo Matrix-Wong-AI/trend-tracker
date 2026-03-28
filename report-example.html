@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>产品趋势报告 — 2026年3月28日</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f0f0f;
+            --bg-secondary: #1c1c1c;
+            --bg-tertiary: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --text-muted: #666666;
+            --accent-green: #3ecf8e;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-orange: #f97316;
+            --border-color: #2a2a2a;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        .code-font {
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+        }
+        
+        /* Navigation */
+        nav {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .brand-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        
+        .brand-text {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 24px;
+        }
+        
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 32px;
+        }
+        
+        /* Header */
+        .report-header {
+            padding: 48px 0 32px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .report-meta {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .badge {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-green {
+            background: rgba(62, 207, 142, 0.1);
+            color: var(--accent-green);
+            border: 1px solid rgba(62, 207, 142, 0.2);
+        }
+        
+        .badge-blue {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent-blue);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        
+        h1 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+        
+        /* Stats Grid */
+        .stats-section {
+            padding: 32px 0;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+        
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 24px;
+        }
+        
+        .stat-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .stat-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        .dot-green { background: var(--accent-green); }
+        .dot-blue { background: var(--accent-blue); }
+        .dot-purple { background: var(--accent-purple); }
+        .dot-orange { background: var(--accent-orange); }
+        
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .stat-change {
+            font-size: 13px;
+            color: var(--accent-green);
+        }
+        
+        /* Section */
+        .section {
+            padding: 40px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .section-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Product Grid */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+        
+        .product-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            transition: border-color 0.2s;
+        }
+        
+        .product-card:hover {
+            border-color: var(--accent-green);
+        }
+        
+        .product-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .product-rank {
+            width: 28px;
+            height: 28px;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--accent-green);
+        }
+        
+        .product-info {
+            flex: 1;
+        }
+        
+        .product-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .product-tagline {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        
+        .product-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        
+        .product-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .product-tags {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .tag {
+            padding: 4px 10px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+        
+        /* Reddit Section */
+        .reddit-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .reddit-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .reddit-score {
+            text-align: center;
+            min-width: 60px;
+        }
+        
+        .reddit-score-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--accent-orange);
+        }
+        
+        .reddit-score-label {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        
+        .reddit-content {
+            flex: 1;
+        }
+        
+        .reddit-title {
+            font-size: 15px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .reddit-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        /* Insights */
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+        
+        .insight-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .insight-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            font-size: 18px;
+        }
+        
+        .insight-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .insight-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        /* Code Block */
+        .code-block {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+        }
+        
+        .code-comment { color: var(--text-muted); }
+        .code-key { color: var(--accent-blue); }
+        .code-value { color: var(--accent-green); }
+        .code-string { color: #eab308; }
+        
+        /* Footer */
+        footer {
+            padding: 32px 0;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stats-section {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .product-grid,
+            .insights-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="brand">
+            <div class="brand-icon">TT</div>
+            <div class="brand-text">TrendTracker</div>
+        </div>
+        <div class="nav-links">
+            <a href="#">Dashboard</a>
+            <a href="#">Reports</a>
+            <a href="#">Settings</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header class="report-header">
+            <div class="report-meta">
+                <span class="badge badge-green">LIVE</span>
+                <span class="badge badge-blue">Daily Report</span>
+            </div>
+            <h1>产品趋势报告</h1>
+            <p class="subtitle">数据时间: 2026年3月28日 | 数据来源: Product Hunt API + Reddit RSS</p>
+        </header>
+
+        <section class="stats-section">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-dot dot-green"></div>
+                    <span class="stat-label">Product Hunt</span>
+                </div>
+                <div class="stat-value">20</div>
+                <div class="stat-change">↑ 今日热门产品</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-dot dot-blue"></div>
+                    <span class="stat-label">Reddit</span>
+                </div>
+                <div class="stat-value">80</div>
+                <div class="stat-change">↑ 热门讨论</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-dot dot-purple"></div>
+                    <span class="stat-label">AI 相关</span>
+                </div>
+                <div class="stat-value">15</div>
+                <div class="stat-change">75% 占比</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-dot dot-orange"></div>
+                    <span class="stat-label">总投票</span>
+                </div>
+                <div class="stat-value">2,847</div>
+                <div class="stat-change">+12% vs 昨日</div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">
+                <span class="section-icon">◈</span>
+                Product Hunt 热门产品
+            </h2>
+            
+            <div class="product-grid">
+                <div class="product-card">
+                    <div class="product-header">
+                        <div class="product-rank">1</div>
+                        <div class="product-info">
+                            <div class="product-name">Agentation</div>
+                            <div class="product-tagline">The visual feedback tool for AI agents</div>
+                        </div>
+                    </div>
+                    <div class="product-meta">
+                        <span>▲ 388</span>
+                        <span>💬 21</span>
+                        <span>开发者工具</span>
+                    </div>
+                    <div class="product-tags">
+                        <span class="tag">AI</span>
+                        <span class="tag">Productivity</span>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-header">
+                        <div class="product-rank">2</div>
+                        <div class="product-info">
+                            <div class="product-name">Claude Code auto-fix</div>
+                            <div class="product-tagline">Auto-fix PRs in the cloud while you stay hands-off</div>
+                        </div>
+                    </div>
+                    <div class="product-meta">
+                        <span>▲ 331</span>
+                        <span>💬 10</span>
+                        <span>开发者工具</span>
+                    </div>
+                    <div class="product-tags">
+                        <span class="tag">AI</span>
+                        <span class="tag">GitHub</span>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-header">
+                        <div class="product-rank">3</div>
+                        <div class="product-info">
+                            <div class="product-name">Gemini 3.1 Flash Live</div>
+                            <div class="product-tagline">Making audio AI more natural and reliable</div>
+                        </div>
+                    </div>
+                    <div class="product-meta">
+                        <span>▲ 310</span>
+                        <span>💬 5</span>
+                        <span>音频 AI</span>
+                    </div>
+                    <div class="product-tags">
+                        <span class="tag">Google</span>
+                        <span class="tag">Audio</span>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-header">
+                        <div class="product-rank">4</div>
+                        <div class="product-info">
+                            <div class="product-name">InsideOrg</div>
+                            <div class="product-tagline">Free organization chart viewer for any company</div>
+                        </div>
+                    </div>
+                    <div class="product-meta">
+                        <span>▲ 308</span>
+                        <span>💬 31</span>
+                        <span>效率工具</span>
+                    </div>
+                    <div class="product-tags">
+                        <span class="tag">SaaS</span>
+                        <span class="tag">B2B</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">
+                <span class="section-icon">◎</span>
+                Reddit 热门讨论
+            </h2>
+            
+            <div class="reddit-list">
+                <div class="reddit-item">
+                    <div class="reddit-score">
+                        <div class="reddit-score-value">631</div>
+                        <div class="reddit-score-label"> votes</div>
+                    </div>
+                    <div class="reddit-content">
+                        <div class="reddit-title">Share your ***Not-AI*** projects</div>
+                        <div class="reddit-meta">r/SideProject • 1652 评论 • 用户对非 AI 项目表现出强烈兴趣</div>
+                    </div>
+                </div>
+                
+                <div class="reddit-item">
+                    <div class="reddit-score">
+                        <div class="reddit-score-value">448</div>
+                        <div class="reddit-score-label"> votes</div>
+                    </div>
+                    <div class="reddit-content">
+                        <div class="reddit-title">I got tired of the internet. So I built a flamethrower for it 🔥</div>
+                        <div class="reddit-meta">r/SideProject • 50 评论 • "Burn Before Reading" Chrome 扩展</div>
+                    </div>
+                </div>
+                
+                <div class="reddit-item">
+                    <div class="reddit-score">
+                        <div class="reddit-score-value">245</div>
+                        <div class="reddit-score-label"> votes</div>
+                    </div>
+                    <div class="reddit-content">
+                        <div class="reddit-title">target="_blank" vs onclick="window.open()" 历史原因讨论</div>
+                        <div class="reddit-meta">r/webdev • 109 评论 • 前端开发技术讨论</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">
+                <span class="section-icon">◉</span>
+                今日洞察
+            </h2>
+            
+            <div class="insights-grid">
+                <div class="insight-card">
+                    <div class="insight-icon">🎯</div>
+                    <div class="insight-title">AI Fatigue 真实存在</div>
+                    <div class="insight-desc">"Not-AI" 帖子获得 631 票高热度，社区对纯 AI 包装产品表现出明显疲劳</div>
+                </div>
+                
+                <div class="insight-card">
+                    <div class="insight-icon">🛠</div>
+                    <div class="insight-title">AI 开发工具主流</div>
+                    <div class="insight-desc">Agentation 和 Claude Code auto-fix 占据前两名，AI 辅助开发仍是热点</div>
+                </div>
+                
+                <div class="insight-card">
+                    <div class="insight-icon">📊</div>
+                    <div class="insight-title">组织效率工具崛起</div>
+                    <div class="insight-desc">InsideOrg (组织架构图) 获得高关注，B2B 效率工具赛道升温</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">
+                <span class="section-icon">◇</span>
+                数据结构
+            </h2>
+            
+            <div class="code-block">
+                <span class="code-comment">// Product Hunt 数据结构</span><br>
+                {<br>
+                <span class="code-key">  "name"</span>: <span class="code-string">"Agentation"</span>,<br>
+                <span class="code-key">  "tagline"</span>: <span class="code-string">"AI agent visual feedback tool"</span>,<br>
+                <span class="code-key">  "votes"</span>: <span class="code-value">388</span>,<br>
+                <span class="code-key">  "comments"</span>: <span class="code-value">21</span>,<br>
+                <span class="code-key">  "topics"</span>: [<span class="code-string">"AI"</span>, <span class="code-string">"Developer Tools"</span>]<br>
+                }
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p>Generated by TrendTracker v1.0 | Data updated: 2026-03-28 14:35</p>
+    </footer>
+</body>
+</html>

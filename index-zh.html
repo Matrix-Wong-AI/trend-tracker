@@ -1,622 +1,990 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TrendTracker - 全球产品趋势雷达</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        :root {
-            --ink: #1a1a1a;
-            --paper: #faf9f7;
-            --stone: #8c8c8c;
-            --mist: #e8e6e3;
-            --vermillion: #c45c48;
-            --indigo: #4a5568;
-        }
-        
-        body {
-            font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Noto Sans JP", sans-serif;
-            background: var(--paper);
-            color: var(--ink);
-            line-height: 1.8;
-            letter-spacing: 0.02em;
-        }
-        
-        /* Language Switcher */
-        .lang-switch {
-            position: fixed;
-            top: 20px;
-            right: 40px;
-            z-index: 1001;
-            display: flex;
-            gap: 15px;
-        }
-        
-        .lang-switch a {
-            font-size: 12px;
-            color: var(--stone);
-            text-decoration: none;
-            letter-spacing: 0.1em;
-            transition: color 0.3s;
-        }
-        
-        .lang-switch a:hover,
-        .lang-switch a.active {
-            color: var(--vermillion);
-        }
-        
-        nav {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            padding: 20px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(250, 249, 247, 0.95);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            border-bottom: 1px solid var(--mist);
-        }
-        
-        .logo {
-            font-size: 18px;
-            font-weight: 600;
-            letter-spacing: 0.1em;
-        }
-        
-        .nav-links {
-            display: flex;
-            gap: 40px;
-        }
-        
-        .nav-links a {
-            text-decoration: none;
-            color: var(--stone);
-            font-size: 14px;
-            transition: color 0.3s;
-        }
-        
-        .nav-links a:hover {
-            color: var(--ink);
-        }
-        
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 120px 40px 80px;
-            position: relative;
-        }
-        
-        .hero::before {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(196, 92, 72, 0.03) 0%, transparent 70%);
-            pointer-events: none;
-        }
-        
-        .hero-badge {
-            font-size: 12px;
-            color: var(--vermillion);
-            letter-spacing: 0.2em;
-            margin-bottom: 30px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .hero-badge::before {
-            content: "";
-            width: 20px;
-            height: 1px;
-            background: var(--vermillion);
-        }
-        
-        .hero h1 {
-            font-size: 48px;
-            font-weight: 300;
-            line-height: 1.4;
-            margin-bottom: 30px;
-            letter-spacing: 0.05em;
-        }
-        
-        .hero h1 strong {
-            font-weight: 600;
-            position: relative;
-        }
-        
-        .hero h1 strong::after {
-            content: "";
-            position: absolute;
-            bottom: 5px;
-            left: 0;
-            width: 100%;
-            height: 8px;
-            background: rgba(196, 92, 72, 0.15);
-            z-index: -1;
-        }
-        
-        .hero-subtitle {
-            font-size: 18px;
-            color: var(--stone);
-            max-width: 500px;
-            margin-bottom: 50px;
-        }
-        
-        .cta-primary {
-            background: var(--ink);
-            color: var(--paper);
-            padding: 18px 48px;
-            font-size: 14px;
-            letter-spacing: 0.15em;
-            text-decoration: none;
-            transition: all 0.4s ease;
-            border: none;
-            cursor: pointer;
-        }
-        
-        .cta-primary:hover {
-            background: var(--vermillion);
-            transform: translateY(-2px);
-        }
-        
-        .hero-stats {
-            display: flex;
-            gap: 60px;
-            margin-top: 80px;
-            padding-top: 40px;
-            border-top: 1px solid var(--mist);
-        }
-        
-        .stat {
-            text-align: center;
-        }
-        
-        .stat-number {
-            font-size: 36px;
-            font-weight: 300;
-            color: var(--ink);
-        }
-        
-        .stat-label {
-            font-size: 12px;
-            color: var(--stone);
-            letter-spacing: 0.1em;
-            margin-top: 5px;
-        }
-        
-        section {
-            padding: 120px 40px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        .section-header {
-            text-align: center;
-            margin-bottom: 80px;
-        }
-        
-        .section-label {
-            font-size: 11px;
-            color: var(--vermillion);
-            letter-spacing: 0.3em;
-            margin-bottom: 20px;
-        }
-        
-        .section-title {
-            font-size: 32px;
-            font-weight: 300;
-            letter-spacing: 0.05em;
-        }
-        
-        .features {
-            background: white;
-        }
-        
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 60px;
-        }
-        
-        .feature {
-            text-align: center;
-            padding: 40px 20px;
-        }
-        
-        .feature-icon {
-            width: 60px;
-            height: 60px;
-            margin: 0 auto 30px;
-            border: 1px solid var(--mist);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-        
-        .feature h3 {
-            font-size: 18px;
-            font-weight: 500;
-            margin-bottom: 15px;
-            letter-spacing: 0.05em;
-        }
-        
-        .feature p {
-            font-size: 14px;
-            color: var(--stone);
-            line-height: 1.8;
-        }
-        
-        .how-it-works {
-            background: var(--paper);
-        }
-        
-        .steps {
-            display: flex;
-            justify-content: space-between;
-            gap: 40px;
-        }
-        
-        .step {
-            flex: 1;
-            text-align: center;
-            position: relative;
-        }
-        
-        .step:not(:last-child)::after {
-            content: "";
-            position: absolute;
-            top: 30px;
-            right: -20px;
-            width: 40px;
-            height: 1px;
-            background: var(--mist);
-        }
-        
-        .step-number {
-            font-size: 48px;
-            font-weight: 100;
-            color: var(--vermillion);
-            opacity: 0.3;
-            margin-bottom: 20px;
-        }
-        
-        .step h3 {
-            font-size: 16px;
-            font-weight: 500;
-            margin-bottom: 10px;
-        }
-        
-        .step p {
-            font-size: 13px;
-            color: var(--stone);
-        }
-        
-        .pricing {
-            background: white;
-        }
-        
-        .pricing-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        
-        .pricing-card {
-            border: 1px solid var(--mist);
-            padding: 40px 30px;
-            text-align: center;
-            position: relative;
-            transition: all 0.3s;
-        }
-        
-        .pricing-card:hover {
-            border-color: var(--ink);
-            transform: translateY(-5px);
-        }
-        
-        .pricing-card.featured {
-            border-color: var(--ink);
-            background: var(--ink);
-            color: var(--paper);
-        }
-        
-        .pricing-card.featured .price,
-        .pricing-card.featured .pricing-features li {
-            color: var(--paper);
-        }
-        
-        .pricing-name {
-            font-size: 12px;
-            letter-spacing: 0.2em;
-            margin-bottom: 20px;
-            color: var(--stone);
-        }
-        
-        .pricing-card.featured .pricing-name {
-            color: var(--vermillion);
-        }
-        
-        .price {
-            font-size: 42px;
-            font-weight: 300;
-            margin-bottom: 30px;
-        }
-        
-        .price span {
-            font-size: 14px;
-            color: var(--stone);
-        }
-        
-        .pricing-features {
-            list-style: none;
-            margin-bottom: 30px;
-        }
-        
-        .pricing-features li {
-            font-size: 13px;
-            padding: 10px 0;
-            color: var(--stone);
-            border-bottom: 1px solid var(--mist);
-        }
-        
-        .pricing-card.featured .pricing-features li {
-            border-bottom-color: rgba(255,255,255,0.1);
-        }
-        
-        .pricing-features li:last-child {
-            border-bottom: none;
-        }
-        
-        .pricing-cta {
-            display: inline-block;
-            padding: 12px 30px;
-            font-size: 12px;
-            letter-spacing: 0.15em;
-            text-decoration: none;
-            border: 1px solid var(--ink);
-            color: var(--ink);
-            transition: all 0.3s;
-        }
-        
-        .pricing-card.featured .pricing-cta {
-            border-color: var(--paper);
-            color: var(--paper);
-        }
-        
-        .pricing-cta:hover {
-            background: var(--ink);
-            color: var(--paper);
-        }
-        
-        .pricing-card.featured .pricing-cta:hover {
-            background: var(--paper);
-            color: var(--ink);
-        }
-        
-        .cta-section {
-            background: var(--ink);
-            color: var(--paper);
-            text-align: center;
-            padding: 100px 40px;
-        }
-        
-        .cta-section h2 {
-            font-size: 28px;
-            font-weight: 300;
-            margin-bottom: 20px;
-            letter-spacing: 0.05em;
-        }
-        
-        .cta-section p {
-            color: rgba(255,255,255,0.6);
-            margin-bottom: 40px;
-        }
-        
-        .cta-white {
-            background: var(--paper);
-            color: var(--ink);
-            padding: 18px 48px;
-            font-size: 14px;
-            letter-spacing: 0.15em;
-            text-decoration: none;
-            display: inline-block;
-            transition: all 0.4s;
-        }
-        
-        .cta-white:hover {
-            background: var(--vermillion);
-            color: var(--paper);
-        }
-        
-        footer {
-            background: var(--paper);
-            padding: 60px 40px;
-            text-align: center;
-            border-top: 1px solid var(--mist);
-        }
-        
-        footer p {
-            font-size: 12px;
-            color: var(--stone);
-            letter-spacing: 0.1em;
-        }
-        
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 32px; }
-            .features-grid,
-            .pricing-grid { grid-template-columns: 1fr; }
-            .steps { flex-direction: column; }
-            .step:not(:last-child)::after { display: none; }
-            .nav-links { display: none; }
-            .lang-switch { top: 10px; right: 20px; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrendTracker — 产品趋势雷达</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Noto+Serif+SC:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #06080f;
+    --bg2: #0a0d18;
+    --grid: rgba(99,130,255,0.06);
+    --accent: #4f7cff;
+    --accent2: #7b5ea7;
+    --gold: #e8c97a;
+    --text: #dde4f5;
+    --muted: #5a6480;
+    --card-bg: rgba(255,255,255,0.025);
+    --card-border: rgba(99,130,255,0.12);
+    --glow: rgba(79,124,255,0.18);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* ── Custom Cursor ── */
+  #cursor {
+    position: fixed; width: 12px; height: 12px;
+    background: var(--accent); border-radius: 50%;
+    pointer-events: none; z-index: 9999;
+    transform: translate(-50%,-50%);
+    transition: transform 0.1s, width 0.3s, height 0.3s, opacity 0.3s;
+    mix-blend-mode: screen;
+  }
+  #cursor-ring {
+    position: fixed; width: 36px; height: 36px;
+    border: 1px solid rgba(79,124,255,0.5);
+    border-radius: 50%; pointer-events: none; z-index: 9998;
+    transform: translate(-50%,-50%);
+    transition: transform 0.18s cubic-bezier(0.23,1,0.32,1),
+                width 0.3s, height 0.3s, opacity 0.3s;
+  }
+  body:hover #cursor { opacity: 1; }
+
+  /* ── Canvas Background ── */
+  #starfield {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0; pointer-events: none;
+  }
+
+  /* ── Grid Overlay ── */
+  .grid-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 60px 60px;
+    z-index: 1; pointer-events: none;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 0 48px;
+    height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(6,8,15,0.7);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(99,130,255,0.08);
+  }
+  .nav-logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px; letter-spacing: 0.02em;
+    color: var(--text);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .nav-logo .dot {
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(79,124,255,0.6); }
+    50% { box-shadow: 0 0 0 6px rgba(79,124,255,0); }
+  }
+  .nav-links {
+    display: flex; gap: 32px; list-style: none;
+    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  .nav-links a {
+    color: var(--muted); text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta {
+    font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--accent); background: rgba(79,124,255,0.1);
+    border: 1px solid rgba(79,124,255,0.3);
+    padding: 8px 20px; border-radius: 4px;
+    text-decoration: none;
+    transition: background 0.25s, border-color 0.25s, box-shadow 0.25s;
+  }
+  .nav-cta:hover {
+    background: rgba(79,124,255,0.2);
+    border-color: rgba(79,124,255,0.6);
+    box-shadow: 0 0 20px rgba(79,124,255,0.2);
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative; z-index: 10;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 120px 48px 80px;
+  }
+
+  .hero-eyebrow {
+    font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(79,124,255,0.08);
+    border: 1px solid rgba(79,124,255,0.2);
+    padding: 6px 16px; border-radius: 100px;
+    margin-bottom: 40px;
+    display: inline-flex; align-items: center; gap: 8px;
+    opacity: 0; animation: fadeUp 0.8s 0.3s ease forwards;
+  }
+  .hero-eyebrow::before {
+    content: ''; width: 6px; height: 6px;
+    background: var(--accent); border-radius: 50%;
+    animation: pulse 1.5s infinite;
+  }
+
+  .hero-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(52px, 8vw, 96px);
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 12px;
+    opacity: 0; animation: fadeUp 1s 0.5s ease forwards;
+  }
+  .hero-title .accent-word {
+    color: transparent;
+    background: linear-gradient(135deg, #4f7cff 0%, #a78bfa 50%, #e8c97a 100%);
+    -webkit-background-clip: text; background-clip: text;
+    display: block;
+  }
+
+  .hero-sub {
+    font-size: 13px; line-height: 1.8; letter-spacing: 0.05em;
+    color: var(--muted); max-width: 480px;
+    margin: 24px auto 48px;
+    opacity: 0; animation: fadeUp 0.8s 0.8s ease forwards;
+  }
+
+  .hero-actions {
+    display: flex; gap: 16px; justify-content: center; align-items: center;
+    opacity: 0; animation: fadeUp 0.8s 1s ease forwards;
+  }
+  .btn-primary {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: #06080f; background: var(--accent);
+    border: none; padding: 14px 32px; border-radius: 4px;
+    cursor: none; text-decoration: none;
+    transition: box-shadow 0.3s, transform 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .btn-primary::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 60%);
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .btn-primary:hover {
+    box-shadow: 0 0 40px rgba(79,124,255,0.5), 0 8px 24px rgba(79,124,255,0.3);
+    transform: translateY(-2px);
+  }
+  .btn-primary:hover::after { opacity: 1; }
+
+  .btn-ghost {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); background: transparent;
+    border: 1px solid var(--card-border); padding: 14px 32px; border-radius: 4px;
+    cursor: none; text-decoration: none;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .btn-ghost:hover { color: var(--text); border-color: rgba(99,130,255,0.3); }
+
+  /* ── Radial glow behind hero ── */
+  .hero-glow {
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(ellipse, rgba(79,124,255,0.12) 0%, transparent 70%);
+    top: 50%; left: 50%; transform: translate(-50%,-50%);
+    pointer-events: none;
+    animation: glowPulse 6s ease-in-out infinite;
+  }
+  .hero-glow2 {
+    position: absolute;
+    width: 400px; height: 400px;
+    background: radial-gradient(ellipse, rgba(123,94,167,0.1) 0%, transparent 70%);
+    top: 40%; left: 55%; transform: translate(-50%,-50%);
+    pointer-events: none;
+    animation: glowPulse 8s 2s ease-in-out infinite;
+  }
+  @keyframes glowPulse {
+    0%,100% { opacity: 0.7; transform: translate(-50%,-50%) scale(1); }
+    50% { opacity: 1; transform: translate(-50%,-50%) scale(1.1); }
+  }
+
+  /* ── TICKER ── */
+  .ticker-wrap {
+    position: relative; z-index: 10;
+    border-top: 1px solid var(--card-border);
+    border-bottom: 1px solid var(--card-border);
+    background: rgba(10,13,24,0.8);
+    overflow: hidden; padding: 14px 0;
+    opacity: 0; animation: fadeIn 1s 1.4s ease forwards;
+  }
+  .ticker {
+    display: flex; gap: 0; white-space: nowrap;
+    animation: ticker 30s linear infinite;
+  }
+  .ticker-item {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 0 40px;
+    font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--muted);
+  }
+  .ticker-item .tag {
+    color: var(--accent); font-size: 9px;
+    background: rgba(79,124,255,0.1);
+    padding: 2px 8px; border-radius: 2px;
+  }
+  .ticker-item .tag.ph { color: #da552f; background: rgba(218,85,47,0.1); }
+  .ticker-item .tag.hn { color: #ff6600; background: rgba(255,102,0,0.1); }
+  @keyframes ticker {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  /* ── SECTION COMMON ── */
+  section { position: relative; z-index: 10; }
+
+  .section-label {
+    font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 16px;
+  }
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(32px, 4vw, 52px);
+    line-height: 1.1; letter-spacing: -0.01em;
+    color: var(--text);
+  }
+  .section-desc {
+    font-size: 12px; line-height: 1.9; letter-spacing: 0.04em;
+    color: var(--muted); max-width: 480px;
+    margin-top: 16px;
+  }
+
+  /* ── HOW IT WORKS ── */
+  .how {
+    padding: 120px 48px;
+    max-width: 1200px; margin: 0 auto;
+  }
+  .how-header { text-align: center; margin-bottom: 80px; }
+  .how-header .section-desc { margin: 16px auto 0; }
+
+  .steps {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1px; background: var(--card-border);
+    border: 1px solid var(--card-border);
+    border-radius: 8px; overflow: hidden;
+  }
+  .step {
+    background: var(--bg2); padding: 48px 40px;
+    position: relative; overflow: hidden;
+    opacity: 0; transform: translateY(30px);
+    transition: background 0.3s;
+  }
+  .step.visible { animation: fadeUp 0.7s ease forwards; }
+  .step:hover { background: rgba(79,124,255,0.04); }
+  .step::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .step:hover::before { opacity: 1; }
+
+  .step-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 64px; line-height: 1;
+    color: rgba(79,124,255,0.1);
+    position: absolute; top: 24px; right: 32px;
+    user-select: none;
+  }
+  .step-icon {
+    width: 44px; height: 44px; margin-bottom: 28px;
+    background: rgba(79,124,255,0.08);
+    border: 1px solid rgba(79,124,255,0.15);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .step h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px; margin-bottom: 12px;
+    color: var(--text);
+  }
+  .step p {
+    font-size: 11px; line-height: 1.9; letter-spacing: 0.04em;
+    color: var(--muted);
+  }
+  .step .sources {
+    margin-top: 20px; display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  .source-tag {
+    font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 3px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--muted);
+  }
+
+  /* ── FEATURES ── */
+  .features {
+    padding: 120px 48px;
+    background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 50%, var(--bg) 100%);
+  }
+  .features-inner {
+    max-width: 1200px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 80px; align-items: start;
+  }
+  .features-left { position: sticky; top: 120px; }
+  .feat-list { margin-top: 48px; display: flex; flex-direction: column; gap: 0; }
+  .feat-item {
+    padding: 24px 0;
+    border-bottom: 1px solid var(--card-border);
+    cursor: none;
+    display: flex; gap: 20px; align-items: flex-start;
+    opacity: 0; transform: translateX(-20px);
+    transition: all 0.3s;
+  }
+  .feat-item.visible { animation: fadeLeft 0.6s ease forwards; }
+  .feat-item:hover .feat-icon { border-color: rgba(79,124,255,0.5); color: var(--accent); }
+  .feat-icon {
+    width: 36px; height: 36px; flex-shrink: 0;
+    border: 1px solid var(--card-border);
+    border-radius: 6px; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; transition: all 0.3s; color: var(--muted);
+    margin-top: 2px;
+  }
+  .feat-text h4 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 17px; color: var(--text); margin-bottom: 6px;
+  }
+  .feat-text p {
+    font-size: 11px; line-height: 1.8; letter-spacing: 0.04em;
+    color: var(--muted);
+  }
+
+  /* ── Mock Dashboard Card ── */
+  .dashboard-mock {
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+    opacity: 0; transform: translateY(40px);
+  }
+  .dashboard-mock.visible { animation: fadeUp 0.9s 0.2s ease forwards; }
+  .mock-header {
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid var(--card-border);
+    padding: 16px 20px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .mock-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .mock-title {
+    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin-left: auto;
+  }
+  .mock-body { padding: 24px; }
+  .trend-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+    opacity: 0;
+  }
+  .trend-row.visible { animation: fadeLeft 0.5s ease forwards; }
+  .trend-rank {
+    font-size: 11px; color: var(--muted); width: 24px; text-align: right; flex-shrink: 0;
+  }
+  .trend-bar-wrap {
+    flex: 1; height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden;
+  }
+  .trend-bar {
+    height: 100%; border-radius: 3px;
+    background: linear-gradient(90deg, var(--accent), #a78bfa);
+    transform-origin: left;
+    transform: scaleX(0);
+    transition: transform 1s cubic-bezier(0.23,1,0.32,1);
+  }
+  .trend-bar.animated { transform: scaleX(1); }
+  .trend-label { font-size: 11px; letter-spacing: 0.04em; color: var(--text); flex: 1.2; }
+  .trend-score {
+    font-size: 10px; color: var(--accent);
+    background: rgba(79,124,255,0.1); padding: 3px 8px; border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  .mini-chart {
+    margin-top: 24px; padding: 20px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+  }
+  .mini-chart-label {
+    font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 16px;
+  }
+  .chart-bars {
+    display: flex; align-items: flex-end;
+    gap: 6px; height: 60px;
+  }
+  .chart-bar {
+    flex: 1; border-radius: 2px 2px 0 0;
+    background: linear-gradient(180deg, var(--accent) 0%, rgba(79,124,255,0.3) 100%);
+    transform-origin: bottom; transform: scaleY(0);
+    transition: transform 0.6s cubic-bezier(0.23,1,0.32,1);
+  }
+  .chart-bar.animated { transform: scaleY(1); }
+
+  /* ── STATS ── */
+  .stats {
+    padding: 80px 48px;
+    border-top: 1px solid var(--card-border);
+    border-bottom: 1px solid var(--card-border);
+  }
+  .stats-inner {
+    max-width: 1200px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(4,1fr); gap: 48px;
+    text-align: center;
+  }
+  .stat { opacity: 0; transform: translateY(20px); }
+  .stat.visible { animation: fadeUp 0.6s ease forwards; }
+  .stat-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 48px; color: var(--text);
+    line-height: 1;
+  }
+  .stat-num span { color: var(--accent); }
+  .stat-label {
+    font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--muted); margin-top: 10px;
+  }
+
+  /* ── PRICING ── */
+  .pricing {
+    padding: 120px 48px;
+    max-width: 1200px; margin: 0 auto;
+  }
+  .pricing-header { text-align: center; margin-bottom: 64px; }
+  .pricing-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1px; background: var(--card-border);
+    border: 1px solid var(--card-border);
+    border-radius: 8px; overflow: hidden;
+  }
+  .plan {
+    background: var(--bg2); padding: 48px 40px;
+    position: relative;
+    opacity: 0; transform: translateY(30px);
+  }
+  .plan.visible { animation: fadeUp 0.7s ease forwards; }
+  .plan.featured {
+    background: rgba(79,124,255,0.06);
+    border-left: 1px solid rgba(79,124,255,0.2);
+    border-right: 1px solid rgba(79,124,255,0.2);
+  }
+  .plan-badge {
+    font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+    background: var(--accent); color: #06080f;
+    padding: 4px 12px; border-radius: 2px;
+    display: inline-block; margin-bottom: 24px;
+  }
+  .plan-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px; color: var(--text); margin-bottom: 8px;
+  }
+  .plan-price {
+    font-size: 40px; color: var(--text);
+    margin: 20px 0 8px;
+  }
+  .plan-price sup { font-size: 18px; vertical-align: top; margin-top: 8px; color: var(--muted); }
+  .plan-price sub { font-size: 13px; color: var(--muted); }
+  .plan-desc {
+    font-size: 11px; line-height: 1.8;
+    color: var(--muted); margin-bottom: 32px;
+    padding-bottom: 32px; border-bottom: 1px solid var(--card-border);
+  }
+  .plan-features { list-style: none; margin-bottom: 40px; }
+  .plan-features li {
+    font-size: 11px; letter-spacing: 0.04em;
+    color: var(--muted); padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .plan-features li::before {
+    content: '▸'; color: var(--accent); flex-shrink: 0;
+  }
+
+  /* ── CTA ── */
+  .cta-section {
+    padding: 120px 48px;
+    text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .cta-glow {
+    position: absolute;
+    width: 800px; height: 400px;
+    background: radial-gradient(ellipse, rgba(79,124,255,0.1) 0%, transparent 70%);
+    top: 50%; left: 50%; transform: translate(-50%,-50%);
+    pointer-events: none;
+  }
+  .cta-section h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(36px, 5vw, 64px);
+    line-height: 1.1; letter-spacing: -0.02em;
+    color: var(--text); max-width: 700px; margin: 0 auto 24px;
+    opacity: 0;
+  }
+  .cta-section h2.visible { animation: fadeUp 0.8s ease forwards; }
+  .cta-section p {
+    font-size: 12px; color: var(--muted); letter-spacing: 0.06em;
+    margin-bottom: 48px; opacity: 0;
+  }
+  .cta-section p.visible { animation: fadeUp 0.8s 0.2s ease forwards; }
+  .cta-actions { opacity: 0; }
+  .cta-actions.visible { animation: fadeUp 0.8s 0.4s ease forwards; }
+
+  .input-row {
+    display: flex; gap: 12px; justify-content: center;
+    max-width: 440px; margin: 0 auto;
+  }
+  .email-input {
+    flex: 1; background: rgba(255,255,255,0.04);
+    border: 1px solid var(--card-border);
+    border-radius: 4px; padding: 14px 20px;
+    font-family: 'DM Mono', monospace; font-size: 12px;
+    color: var(--text); outline: none;
+    transition: border-color 0.3s;
+  }
+  .email-input::placeholder { color: var(--muted); }
+  .email-input:focus { border-color: rgba(79,124,255,0.4); }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative; z-index: 10;
+    border-top: 1px solid var(--card-border);
+    padding: 48px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer-logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 16px; color: var(--muted);
+  }
+  .footer-copy {
+    font-size: 10px; letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+  .footer-links {
+    display: flex; gap: 24px; list-style: none;
+  }
+  .footer-links a {
+    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--text); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeLeft {
+    from { opacity: 0; transform: translateX(-20px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+</style>
 </head>
 <body>
-    <!-- Language Switcher -->
-    <div class="lang-switch">
-        <a href="index.html">EN</a>
-        <a href="index-zh.html" class="active">中文</a>
-        <a href="index-ja.html">日本語</a>
+  <!-- Cursor -->
+  <div id="cursor"></div>
+  <div id="cursor-ring"></div>
+
+  <!-- Canvas Starfield -->
+  <canvas id="starfield"></canvas>
+
+  <!-- Grid Overlay -->
+  <div class="grid-overlay"></div>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">
+      <span class="dot"></span>
+      TrendTracker
+    </div>
+    <ul class="nav-links">
+      <li><a href="#features">功能</a></li>
+      <li><a href="#pricing">定价</a></li>
+      <li><a href="#docs">文档</a></li>
+    </ul>
+    <a href="#" class="nav-cta">开始使用</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-glow2"></div>
+
+    <div class="hero-eyebrow">实时产品趋势追踪</div>
+
+    <h1 class="hero-title">
+      捕获每一次
+      <span class="accent-word">产品浪潮</span>
+    </h1>
+
+    <p class="hero-sub">
+      自动抓取 Product Hunt、Reddit 等平台的热门产品与讨论，
+      生成可视化趋势报告，助你把握市场先机。
+    </p>
+
+    <div class="hero-actions">
+      <a href="#" class="btn-primary">免费开始</a>
+      <a href="#" class="btn-ghost">查看演示</a>
+    </div>
+  </section>
+
+  <!-- TICKER -->
+  <div class="ticker-wrap">
+    <div class="ticker">
+      <span class="ticker-item"><span class="tag ph">PH</span> Agentation — AI 反馈工具</span>
+      <span class="ticker-item"><span class="tag">REDDIT</span> Not-AI 项目讨论热度 631↑</span>
+      <span class="ticker-item"><span class="tag ph">PH</span> Claude Code auto-fix — 自动修复 PR</span>
+      <span class="ticker-item"><span class="tag">REDDIT</span> 互联网火焰喷射器 🔥</span>
+      <span class="ticker-item"><span class="tag ph">PH</span> Gemini 3.1 Flash Live</span>
+      <!-- Duplicate for infinite scroll -->
+      <span class="ticker-item"><span class="tag ph">PH</span> Agentation — AI 反馈工具</span>
+      <span class="ticker-item"><span class="tag">REDDIT</span> Not-AI 项目讨论热度 631↑</span>
+      <span class="ticker-item"><span class="tag ph">PH</span> Claude Code auto-fix — 自动修复 PR</span>
+      <span class="ticker-item"><span class="tag">REDDIT</span> 互联网火焰喷射器 🔥</span>
+      <span class="ticker-item"><span class="tag ph">PH</span> Gemini 3.1 Flash Live</span>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <section class="how" id="features">
+    <div class="how-header">
+      <div class="section-label">工作流程</div>
+      <h2 class="section-title">三步上手</h2>
+      <p class="section-desc">
+        配置数据源 → 自动采集 → 查看报告。
+        无需复杂设置，开箱即用。
+      </p>
     </div>
 
-    <!-- Navigation -->
-    <nav>
-        <div class="logo">TRENDTRACKER</div>
-        <div class="nav-links">
-            <a href="#features">功能</a>
-            <a href="#how">使用方法</a>
-            <a href="#pricing">定价</a>
+    <div class="steps">
+      <div class="step">
+        <span class="step-num">01</span>
+        <div class="step-icon">◈</div>
+        <h3>配置数据源</h3>
+        <p>添加 Product Hunt Token，选择关注的 Reddit 板块，一键配置完成。</p>
+        <div class="sources">
+          <span class="source-tag">Product Hunt</span>
+          <span class="source-tag">Reddit</span>
         </div>
-    </nav>
+      </div>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-badge">PRODUCT INTELLIGENCE</div>
-        <h1>不再错过任何<br><strong>产品趋势</strong></h1>
-        <p class="hero-subtitle">自动追踪 Product Hunt、Reddit 等平台的最新产品动态，生成多维度洞察报告，助你把握市场先机。</p>
-        <a href="#pricing" class="cta-primary">开始使用</a>
-        
-        <div class="hero-stats">
-            <div class="stat">
-                <div class="stat-number">20+</div>
-                <div class="stat-label">每日产品</div>
-            </div>
-            <div class="stat">
-                <div class="stat-number">80+</div>
-                <div class="stat-label">热门讨论</div>
-            </div>
-            <div class="stat">
-                <div class="stat-number">8</div>
-                <div class="stat-label">数据源</div>
-            </div>
+      <div class="step">
+        <span class="step-num">02</span>
+        <div class="step-icon">◎</div>
+        <h3>自动采集</h3>
+        <p>每日定时抓取最新产品和热门讨论，自动更新到你的仪表板。</p>
+        <div class="sources">
+          <span class="source-tag">API</span>
+          <span class="source-tag">RSS</span>
         </div>
-    </section>
+      </div>
 
-    <!-- Features Section -->
-    <section class="features" id="features">
-        <div class="section-header">
-            <div class="section-label">FEATURES</div>
-            <h2 class="section-title">核心功能</h2>
+      <div class="step">
+        <span class="step-num">03</span>
+        <div class="step-icon">◉</div>
+        <h3>查看报告</h3>
+        <p>获取可视化趋势报告，把握市场动向，不错过任何机会。</p>
+        <div class="sources">
+          <span class="source-tag">HTML</span>
+          <span class="source-tag">可视化</span>
         </div>
-        
-        <div class="features-grid">
-            <div class="feature">
-                <div class="feature-icon">◈</div>
-                <h3>自动数据采集</h3>
-                <p>每日自动抓取 Product Hunt、Reddit 等平台的热门产品和讨论，无需手动搜索。</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">◉</div>
-                <h3>多维度分析</h3>
-                <p>AI 智能分类产品类型，分析投票趋势、讨论热度，识别新兴技术方向。</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">◎</div>
-                <h3>可视化报告</h3>
-                <p>生成精美的 HTML 报告，支持深色主题，随时随地查看趋势洞察。</p>
-            </div>
-        </div>
-    </section>
+      </div>
+    </div>
+  </section>
 
-    <!-- How It Works -->
-    <section class="how-it-works" id="how">
-        <div class="section-header">
-            <div class="section-label">HOW IT WORKS</div>
-            <h2 class="section-title">简单三步</h2>
-        </div>
-        
-        <div class="steps">
-            <div class="step">
-                <div class="step-number">01</div>
-                <h3>配置数据源</h3>
-                <p>添加 Product Hunt Token，选择关注的 Reddit 板块</p>
-            </div>
-            <div class="step">
-                <div class="step-number">02</div>
-                <h3>自动采集</h3>
-                <p>每日定时抓取最新产品和热门讨论</p>
-            </div>
-            <div class="step">
-                <div class="step-number">03</div>
-                <h3>查看报告</h3>
-                <p>获取可视化趋势报告，把握市场动向</p>
-            </div>
-        </div>
-    </section>
+  <!-- FEATURES -->
+  <section class="features">
+    <div class="features-inner">
+      <div class="features-left">
+        <div class="section-label">核心功能</div>
+        <h2 class="section-title">智能分析引擎</h2>
+        <p class="section-desc">
+          AI 自动分类产品类型，分析投票趋势、讨论热度，识别新兴技术方向。
+        </p>
 
-    <!-- Pricing Section -->
-    <section class="pricing" id="pricing">
-        <div class="section-header">
-            <div class="section-label">PRICING</div>
-            <h2 class="section-title">选择方案</h2>
-        </div>
-        
-        <div class="pricing-grid">
-            <div class="pricing-card">
-                <div class="pricing-name">STARTER</div>
-                <div class="price">¥0<span>/月</span></div>
-                <ul class="pricing-features">
-                    <li>每日 10 个产品</li>
-                    <li>基础趋势报告</li>
-                    <li>邮件通知</li>
-                    <li>社区支持</li>
-                </ul>
-                <a href="#" class="pricing-cta">开始使用</a>
+        <div class="feat-list">
+          <div class="feat-item">
+            <div class="feat-icon">◈</div>
+            <div class="feat-text">
+              <h4>多平台数据采集</h4>
+              <p>Product Hunt + Reddit 双引擎，覆盖产品与讨论</p>
             </div>
-            
-            <div class="pricing-card featured">
-                <div class="pricing-name">PROFESSIONAL</div>
-                <div class="price">¥99<span>/月</span></div>
-                <ul class="pricing-features">
-                    <li>每日 50+ 个产品</li>
-                    <li>高级趋势分析</li>
-                    <li>自定义数据源</li>
-                    <li>API 接入</li>
-                    <li>优先技术支持</li>
-                </ul>
-                <a href="#" class="pricing-cta">立即订阅</a>
-            </div>
-            
-            <div class="pricing-card">
-                <div class="pricing-name">ENTERPRISE</div>
-                <div class="price">定制</div>
-                <ul class="pricing-features">
-                    <li>无限制产品追踪</li>
-                    <li>私有化部署</li>
-                    <li>专属客户经理</li>
-                    <li>SLA 保障</li>
-                </ul>
-                <a href="#" class="pricing-cta">联系销售</a>
-            </div>
-        </div>
-    </section>
+          </div>
 
-    <!-- CTA Section -->
-    <section class="cta-section">
-        <h2>开始追踪产品趋势</h2>
-        <p>加入数千名产品经理和创业者的行列，不再错过任何市场机会。</p>
-        <a href="#pricing" class="cta-white">免费开始</a>
-    </section>
+          <div class="feat-item">
+            <div class="feat-icon">◉</div>
+            <div class="feat-text">
+              <h4>AI 智能分类</h4>
+              <p>自动识别 SaaS、AI 工具、移动 App 等产品类型</p>
+            </div>
+          </div>
 
-    <!-- Footer -->
-    <footer>
-        <p>© 2026 TRENDTRACKER. 全球产品趋势雷达.</p>
-    </footer>
+          <div class="feat-item">
+            <div class="feat-icon">◇</div>
+            <div class="feat-text">
+              <h4>可视化报告</h4>
+              <p>品牌级深色主题设计，支持移动端查看</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-mock">
+        <div class="mock-header">
+          <div class="mock-dot" style="background:#ff5f57"></div>
+          <div class="mock-dot" style="background:#febc2e"></div>
+          <div class="mock-dot" style="background:#28c840"></div>
+          <span class="mock-title">今日趋势</span>
+        </div>
+        <div class="mock-body">
+          <div class="trend-row">
+            <span class="trend-rank">1</span>
+            <div class="trend-bar-wrap"><div class="trend-bar" style="width:95%"></div></div>
+            <span class="trend-label">Agentation</span>
+            <span class="trend-score">388↑</span>
+          </div>
+          <div class="trend-row">
+            <span class="trend-rank">2</span>
+            <div class="trend-bar-wrap"><div class="trend-bar" style="width:85%"></div></div>
+            <span class="trend-label">Claude Code</span>
+            <span class="trend-score">331↑</span>
+          </div>
+          <div class="trend-row">
+            <span class="trend-rank">3</span>
+            <div class="trend-bar-wrap"><div class="trend-bar" style="width:78%"></div></div>
+            <span class="trend-label">Gemini 3.1</span>
+            <span class="trend-score">310↑</span>
+          </div>
+          <div class="trend-row">
+            <span class="trend-rank">4</span>
+            <div class="trend-bar-wrap"><div class="trend-bar" style="width:72%"></div></div>
+            <span class="trend-label">InsideOrg</span>
+            <span class="trend-score">308↑</span>
+          </div>
+
+          <div class="mini-chart">
+            <div class="mini-chart-label">趋势热度</div>
+            <div class="chart-bars">
+              <div class="chart-bar" style="height:40%"></div>
+              <div class="chart-bar" style="height:65%"></div>
+              <div class="chart-bar" style="height:55%"></div>
+              <div class="chart-bar" style="height:85%"></div>
+              <div class="chart-bar" style="height:70%"></div>
+              <div class="chart-bar" style="height:90%"></div>
+              <div class="chart-bar" style="height:75%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="stats">
+    <div class="stats-inner">
+      <div class="stat">
+        <div class="stat-num">20<span>+</span></div>
+        <div class="stat-label">每日产品</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">80<span>+</span></div>
+        <div class="stat-label">热门讨论</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">8</div>
+        <div class="stat-label">数据源</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">13<span>KB</span></div>
+        <div class="stat-label">轻量体积</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pricing" id="pricing">
+    <div class="pricing-header">
+      <div class="section-label">定价方案</div>
+      <h2 class="section-title">选择适合你的方案</h2>
+    </div>
+
+    <div class="pricing-grid">
+      <div class="plan">
+        <div class="plan-name">Starter</div>
+        <div class="plan-price"><sup>¥</sup>0<sub>/月</sub></div>
+        <p class="plan-desc">适合个人用户，基础趋势追踪</p>
+        <ul class="plan-features">
+          <li>每日 10 个产品</li>
+          <li>基础趋势报告</li>
+          <li>邮件通知</li>
+          <li>社区支持</li>
+        </ul>
+        <a href="#" class="btn-ghost" style="display:block;text-align:center">开始使用</a>
+      </div>
+
+      <div class="plan featured">
+        <span class="plan-badge">推荐</span>
+        <div class="plan-name">Professional</div>
+        <div class="plan-price"><sup>¥</sup>99<sub>/月</sub></div>
+        <p class="plan-desc">适合专业用户，深度分析</p>
+        <ul class="plan-features">
+          <li>每日 50+ 个产品</li>
+          <li>高级趋势分析</li>
+          <li>自定义数据源</li>
+          <li>API 接入</li>
+          <li>优先技术支持</li>
+        </ul>
+        <a href="#" class="btn-primary" style="display:block;text-align:center">立即订阅</a>
+      </div>
+
+      <div class="plan">
+        <div class="plan-name">Enterprise</div>
+        <div class="plan-price">定制</div>
+        <p class="plan-desc">适合企业用户，私有化部署</p>
+        <ul class="plan-features">
+          <li>无限制产品追踪</li>
+          <li>私有化部署</li>
+          <li>专属客户经理</li>
+          <li>SLA 保障</li>
+        </ul>
+        <a href="#" class="btn-ghost" style="display:block;text-align:center">联系销售</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="cta-glow"></div>
+    <h2>开始追踪产品趋势</h2>
+    <p>加入数千名产品经理和创业者的行列，不再错过任何市场机会。</p>
+    <div class="cta-actions">
+      <div class="input-row">
+        <input type="email" class="email-input" placeholder="输入你的邮箱">
+        <a href="#" class="btn-primary">免费开始</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">TrendTracker</div>
+    <div class="footer-copy">© 2026 All rights reserved</div>
+    <ul class="footer-links">
+      <li><a href="#">GitHub</a></li>
+      <li><a href="#">文档</a></li>
+      <li><a href="#">Twitter</a></li>
+    </ul>
+  </footer>
+
+  <!-- Starfield Animation -->
+  <script>
+    const canvas = document.getElementById('starfield');
+    const ctx = canvas.getContext('2d');
+
+    let width, height, stars = [];
+
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+
+    class Star {
+      constructor() {
+        this.reset();
+      }
+      reset() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.z = Math.random() * 2 + 0.5;
+        this.opacity = Math.random() * 0.5 + 0.1;
+      }
+      update() {
+        this.y -= 0.2 * this.z;
+        if (this.y < 0) this.reset();
+      }
+      draw() {
+        ctx.fillStyle = `rgba(99,130,255,${this.opacity})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.z, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function init() {
+      resize();
+      for (let i = 0; i < 150; i++) {
+        stars.push(new Star());
+      }
+      animate();
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+      stars.forEach(star => {
+        star.update();
+        star.draw();
+      });
+      requestAnimationFrame(animate);
+    }
+
+    window.addEventListener('resize', resize);
+    init();
+
+    // Custom cursor
+    const cursor = document.getElementById('cursor');
+    const cursorRing = document.getElementById('cursor-ring');
+
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+      setTimeout(() => {
+        cursorRing.style.left = e.clientX + 'px';
+        cursorRing.style.top = e.clientY + 'px';
+      }, 100);
+    });
+
+    // Hover effects
+    document.querySelectorAll('a, button, .step, .feat-item').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursor.style.transform = 'translate(-50%,-50%) scale(1.5)';
+        cursorRing.style.transform = 'translate(-50%,-50%) scale(1.5)';
+      });
+      el.addEventListener('mouseleave', () => {
+        cursor.style.transform = 'translate(-50%,-50%) scale(1)';
+        cursorRing.style.transform = 'translate(-50%,-50%) scale(1)';
+      });
+    });
+  </script>
 </body>
 </html>

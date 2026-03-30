@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrendTracker — 产品趋势雷达</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Noto+Serif+SC:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #06080f;
+    --bg2: #0a0d18;
+    --grid: rgba(99,130,255,0.06);
+    --accent: #4f7cff;
+    --accent2: #7b5ea7;
+    --gold: #e8c97a;
+    --text: #dde4f5;
+    --muted: #5a6480;
+    --card-bg: rgba(255,255,255,0.025);
+    --card-border: rgba(99,130,255,0.12);
+    --glow: rgba(79,124,255,0.18);
+  }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+background: var(--bg);
+color: var(--text);
+font-family: 'DM Mono', monospace;
+overflow-x: hidden;
+cursor: none;
+}
+
+/* ── Custom Cursor ── */
+#cursor {
+position: fixed; width: 12px; height: 12px;
+background: var(--accent); border-radius: 50%;
+pointer-events: none; z-index: 9999;
+transform: translate(-50%,-50%);
+transition: transform 0.1s, width 0.3s, height 0.3s, opacity 0.3s;
+mix-blend-mode: screen;
+}
+#cursor-ring {
+position: fixed; width: 36px; height: 36px;
+border: 1px solid rgba(79,124,255,0.5);
+border-radius: 50%; pointer-events: none; z-index: 9998;
+transform: translate(-50%,-50%);
+transition: transform 0.18s cubic-bezier(0.23,1,0.32,1),
+width 0.3s, height 0.3s, opacity 0.3s;
+}
+body:hover #cursor { opacity: 1; }
+
+/* ── Canvas Background ── */
+#starfield {
+position: fixed; top: 0; left: 0;
+width: 100%; height: 100%;
+z-index: 0; pointer-events: none;
+}
+
+/* ── Grid Overlay ── */
+.grid-overlay {
+position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+background-image:
+linear-gradient(var(--grid) 1px, transparent 1px),
+linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+background-size: 60px 60px;
+z-index: 1; pointer-events: none;
+mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+}
+
+/* ── NAV ── */
+nav {
+position: fixed; top: 0; left: 0; right: 0;
+z-index: 100;
+padding: 0 48px;
+height: 64px;
+display: flex; align-items: center; justify-content: space-between;
+background: rgba(6,8,15,0.7);
+backdrop-filter: blur(20px);
+border-bottom: 1px solid rgba(99,130,255,0.08);
+}
+.nav-logo {
+font-family: 'DM Serif Display', serif;
+font-size: 18px; letter-spacing: 0.02em;
+color: var(--text);
+display: flex; align-items: center; gap: 10px;
+}
+.nav-logo .dot {
+width: 8px; height: 8px;
+background: var(--accent);
+border-radius: 50%;
+animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+0%,100% { box-shadow: 0 0 0 0 rgba(79,124,255,0.6); }
+50% { box-shadow: 0 0 0 6px rgba(79,124,255,0); }
+}
+.nav-links {
+display: flex; gap: 32px; list-style: none;
+font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+}
+.nav-links a {
+color: var(--muted); text-decoration: none;
+transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--text); }
+.nav-cta {
+font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+color: var(--accent); background: rgba(79,124,255,0.1);
+border: 1px solid rgba(79,124,255,0.3);
+padding: 8px 20px; border-radius: 4px;
+text-decoration: none;
+transition: background 0.25s, border-color 0.25s, box-shadow 0.25s;
+}
+.nav-cta:hover {
+background: rgba(79,124,255,0.2);
+border-color: rgba(79,124,255,0.6);
+box-shadow: 0 0 20px rgba(79,124,255,0.2);
+}
+
+/* ── HERO ── */
+.hero {
+position: relative; z-index: 10;
+min-height: 100vh;
+display: flex; flex-direction: column;
+align-items: center; justify-content: center;
+text-align: center;
+padding: 120px 48px 80px;
+}
+
+.hero-eyebrow {
+font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase;
+color: var(--accent);
+background: rgba(79,124,255,0.08);
+border: 1px solid rgba(79,124,255,0.2);
+padding: 6px 16px; border-radius: 100px;
+margin-bottom: 40px;
+display: inline-flex; align-items: center; gap: 8px;
+opacity: 0; animation: fadeUp 0.8s 0.3s ease forwards;
+}
+.hero-eyebrow::before {
+content: ''; width: 6px; height: 6px;
+background: var(--accent); border-radius: 50%;
+animation: pulse 1.5s infinite;
+}
+
+.hero-title {
+font-family: 'DM Serif Display', serif;
+font-size: clamp(52px, 8vw, 96px);
+line-height: 1.0;
+letter-spacing: -0.02em;
+color: var(--text);
+margin-bottom: 12px;
+opacity: 0; animation: fadeUp 1s 0.5s ease forwards;
+}
+.hero-title .accent-word {
+color: transparent;
+background: linear-gradient(135deg, #4f7cff 0%, #a78bfa 50%, #e8c97a 100%);
+-webkit-background-clip: text; background-clip: text;
+display: block;
+}
+
+.hero-sub {
+font-size: 13px; line-height: 1.8; letter-spacing: 0.05em;
+color: var(--muted); max-width: 480px;
+margin: 24px auto 48px;
+opacity: 0; animation: fadeUp 0.8s 0.8s ease forwards;
+}
+
+.hero-actions {
+display: flex; gap: 16px; justify-content: center; align-items: center;
+opacity: 0; animation: fadeUp 0.8s 1s ease forwards;
+}
+.btn-primary {
+font-family: 'DM Mono', monospace;
+font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
+color: #06080f; background: var(--accent);
+border: none; padding: 14px 32px; border-radius: 4px;
+cursor: none; text-decoration: none;
+transition: box-shadow 0.3s, transform 0.2s;
+position: relative; overflow: hidden;
+}
+.btn-primary::after {
+content: ''; position: absolute; inset: 0;
+background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 60%);
+opacity: 0; transition: opacity 0.3s;
+}
+.btn-primary:hover {
+box-shadow: 0 0 40px rgba(79,124,255,0.5), 0 8px 24px rgba(79,124,255,0.3);
+transform: translateY(-2px);
+}
+.btn-primary:hover::after { opacity: 1; }
+
+.btn-ghost {
+font-family: 'DM Mono', monospace;
+font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
+color: var(--muted); background: transparent;
+border: 1px solid var(--card-border); padding: 14px 32px; border-radius: 4px;
+cursor: none; text-decoration: none;
+transition: color 0.2s, border-color 0.2s;
+}
+.btn-ghost:hover { color: var(--text); border-color: rgba(99,130,255,0.3); }
+
+/* ── Radial glow behind hero ── */
+.hero-glow {
+position: absolute;
+width: 600px; height: 600px;
+background: radial-gradient(ellipse, rgba(79,124,255,0.12) 0%, transparent 70%);
+top: 50%; left: 50%; transform: translate(-50%,-50%);
+pointer-events: none;
+animation: glowPulse 6s ease-in-out infinite;
+}
+.hero-glow2 {
+position: absolute;
+width: 400px; height: 400px;
+background: radial-gradient(ellipse, rgba(123,94,167,0.1) 0%, transparent 70%);
+top: 40%; left: 55%; transform: translate(-50%,-50%);
+pointer-events: none;
+animation: glowPulse 8s 2s ease-in-out infinite;
+}
+@keyframes glowPulse {
+0%,100% { opacity: 0.7; transform: translate(-50%,-50%) scale(1); }
+50% { opacity: 1; transform: translate(-50%,-50%) scale(1.1); }
+}
+
+/* ── TICKER ── */
+.ticker-wrap {
+position: relative; z-index: 10;
+border-top: 1px solid var(--card-border);
+border-bottom: 1px solid var(--card-border);
+background: rgba(10,13,24,0.8);
+overflow: hidden; padding: 14px 0;
+opacity: 0; animation: fadeIn 1s 1.4s ease forwards;
+}
+.ticker {
+display: flex; gap: 0; white-space: nowrap;
+animation: ticker 30s linear infinite;
+}
+.ticker-item {
+display: inline-flex; align-items: center; gap: 10px;
+padding: 0 40px;
+font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+color: var(--muted);
+}
+.ticker-item .tag {
+color: var(--accent); font-size: 9px;
+background: rgba(79,124,255,0.1);
+padding: 2px 8px; border-radius: 2px;
+}
+.ticker-item .tag.ph { color: #da552f; background: rgba(218,85,47,0.1); }
+.ticker-item .tag.hn { color: #ff6600; background: rgba(255,102,0,0.1); }
+@keyframes ticker {
+from { transform: translateX(0); }
+to   { transform: translateX(-50%); }
+}
+
+/* ── SECTION COMMON ── */
+section { position: relative; z-index: 10; }
+
+.section-label {
+font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase;
+color: var(--accent); margin-bottom: 16px;
+}
+.section-title {
+font-family: 'DM Serif Display', serif;
+font-size: clamp(32px, 4vw, 52px);
+line-height: 1.1; letter-spacing: -0.01em;
+color: var(--text);
+}
+.section-desc {
+font-size: 12px; line-height: 1.9; letter-spacing: 0.04em;
+color: var(--muted); max-width: 480px;
+margin-top: 16px;
+}
+
+/* ── HOW IT WORKS ── */
+.how {
+padding: 120px 48px;
+max-width: 1200px; margin: 0 auto;
+}
+.how-header { text-align: center; margin-bottom: 80px; }
+.how-header .section-desc { margin: 16px auto 0; }
+
+.steps {
+display: grid; grid-template-columns: repeat(3, 1fr);
+gap: 1px; background: var(--card-border);
+border: 1px solid var(--card-border);
+border-radius: 8px; overflow: hidden;
+}
+.step {
+background: var(--bg2); padding: 48px 40px;
+position: relative; overflow: hidden;
+opacity: 0; transform: translateY(30px);
+transition: background 0.3s;
+}
+.step.visible { animation: fadeUp 0.7s ease forwards; }
+.step:hover { background: rgba(79,124,255,0.04); }
+.step::before {
+content: ''; position: absolute;
+top: 0; left: 0; right: 0; height: 2px;
+background: linear-gradient(90deg, transparent, var(--accent), transparent);
+opacity: 0; transition: opacity 0.3s;
+}
+.step:hover::before { opacity: 1; }
+
+.step-num {
+font-family: 'DM Serif Display', serif;
+font-size: 64px; line-height: 1;
+color: rgba(79,124,255,0.1);
+position: absolute; top: 24px; right: 32px;
+user-select: none;
+}
+.step-icon {
+width: 44px; height: 44px; margin-bottom: 28px;
+background: rgba(79,124,255,0.08);
+border: 1px solid rgba(79,124,255,0.15);
+border-radius: 8px; display: flex; align-items: center; justify-content: center;
+font-size: 20px;
+}
+.step h3 {
+font-family: 'DM Serif Display', serif;
+font-size: 22px; margin-bottom: 12px;
+color: var(--text);
+}
+.step p {
+font-size: 11px; line-height: 1.9; letter-spacing: 0.04em;
+color: var(--muted);
+}
+.step .sources {
+margin-top: 20px; display: flex; flex-wrap: wrap; gap: 8px;
+}
+.source-tag {
+font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+padding: 4px 10px; border-radius: 3px;
+background: rgba(255,255,255,0.04);
+border: 1px solid rgba(255,255,255,0.08);
+color: var(--muted);
+}
+
+/* ── FEATURES ── */
+.features {
+padding: 120px 48px;
+background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 50%, var(--bg) 100%);
+}
+.features-inner {
+max-width: 1200px; margin: 0 auto;
+display: grid; grid-template-columns: 1fr 1fr;
+gap: 80px; align-items: start;
+}
+.features-left { position: sticky; top: 120px; }
+.feat-list { margin-top: 48px; display: flex; flex-direction: column; gap: 0; }
+.feat-item {
+padding: 24px 0;
+border-bottom: 1px solid var(--card-border);
+cursor: none;
+display: flex; gap: 20px; align-items: flex-start;
+opacity: 0; transform: translateX(-20px);
+transition: all 0.3s;
+}
+.feat-item.visible { animation: fadeLeft 0.6s ease forwards; }
+.feat-item:hover .feat-icon { border-color: rgba(79,124,255,0.5); color: var(--accent); }
+.feat-icon {
+width: 36px; height: 36px; flex-shrink: 0;
+border: 1px solid var(--card-border);
+border-radius: 6px; display: flex; align-items: center; justify-content: center;
+font-size: 16px; transition: all 0.3s; color: var(--muted);
+margin-top: 2px;
+}
+.feat-text h4 {
+font-family: 'DM Serif Display', serif;
+font-size: 17px; color: var(--text); margin-bottom: 6px;
+}
+.feat-text p {
+font-size: 11px; line-height: 1.8; letter-spacing: 0.04em;
+color: var(--muted);
+}
+
+/* ── Mock Dashboard Card ── */
+.dashboard-mock {
+border: 1px solid var(--card-border);
+border-radius: 12px;
+background: var(--card-bg);
+backdrop-filter: blur(10px);
+overflow: hidden;
+opacity: 0; transform: translateY(40px);
+}
+.dashboard-mock.visible { animation: fadeUp 0.9s 0.2s ease forwards; }
+.mock-header {
+background: rgba(255,255,255,0.02);
+border-bottom: 1px solid var(--card-border);
+padding: 16px 20px;
+display: flex; align-items: center; gap: 10px;
+}
+.mock-dot { width: 10px; height: 10px; border-radius: 50%; }
+.mock-title {
+font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+color: var(--muted); margin-left: auto;
+}
+.mock-body { padding: 24px; }
+.trend-row {
+display: flex; align-items: center; gap: 14px;
+padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+opacity: 0;
+}
+.trend-row.visible { animation: fadeLeft 0.5s ease forwards; }
+.trend-rank {
+font-size: 11px; color: var(--muted); width: 24px; text-align: right; flex-shrink: 0;
+}
+.trend-bar-wrap {
+flex: 1; height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden;
+}
+.trend-bar {
+height: 100%; border-radius: 3px;
+background: linear-gradient(90deg, var(--accent), #a78bfa);
+transform-origin: left;
+transform: scaleX(0);
+transition: transform 1s cubic-bezier(0.23,1,0.32,1);
+}
+.trend-bar.animated { transform: scaleX(1); }
+.trend-label { font-size: 11px; letter-spacing: 0.04em; color: var(--text); flex: 1.2; }
+.trend-score {
+font-size: 10px; color: var(--accent);
+background: rgba(79,124,255,0.1); padding: 3px 8px; border-radius: 3px;
+flex-shrink: 0;
+}
+
+.mini-chart {
+margin-top: 24px; padding: 20px;
+background: rgba(255,255,255,0.02);
+border: 1px solid var(--card-border);
+border-radius: 8px;
+}
+.mini-chart-label {
+font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+color: var(--muted); margin-bottom: 16px;
+}
+.chart-bars {
+display: flex; align-items: flex-end;
+gap: 6px; height: 60px;
+}
+.chart-bar {
+flex: 1; border-radius: 2px 2px 0 0;
+background: linear-gradient(180deg, var(--accent) 0%, rgba(79,124,255,0.3) 100%);
+transform-origin: bottom; transform: scaleY(0);
+transition: transform 0.6s cubic-bezier(0.23,1,0.32,1);
+}
+.chart-bar.animated { transform: scaleY(1); }
+
+/* ── STATS ── */
+.stats {
+padding: 80px 48px;
+border-top: 1px solid var(--card-border);
+border-bottom: 1px solid var(--card-border);
+}
+.stats-inner {
+max-width: 1200px; margin: 0 auto;
+display: grid; grid-template-columns: repeat(4,1fr); gap: 48px;
+text-align: center;
+}
+.stat { opacity: 0; transform: translateY(20px); }
+.stat.visible { animation: fadeUp 0.6s ease forwards; }
+.stat-num {
+font-family: 'DM Serif Display', serif;
+font-size: 48px; color: var(--text);
+line-height: 1;
+}
+.stat-num span { color: var(--accent); }
+.stat-label {
+font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+color: var(--muted); margin-top: 10px;
+}
+
+/* ── PRICING ── */
+.pricing {
+padding: 120px 48px;
+max-width: 1200px; margin: 0 auto;
+}
+.pricing-header { text-align: center; margin-bottom: 64px; }
+.pricing-grid {
+display: grid; grid-template-columns: repeat(3, 1fr);
+gap: 1px; background: var(--card-border);
+border: 1px solid var(--card-border);
+border-radius: 8px; overflow: hidden;
+}
+.plan {
+background: var(--bg2); padding: 48px 40px;
+position: relative;
+opacity: 0; transform: translateY(30px);
+}
+.plan.visible { animation: fadeUp 0.7s ease forwards; }
+.plan.featured {
+background: rgba(79,124,255,0.06);
+border-left: 1px solid rgba(79,124,255,0.2);
+border-right: 1px solid rgba(79,124,255,0.2);
+}
+.plan-badge {
+font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+background: var(--accent); color: #06080f;
+padding: 4px 12px; border-radius: 2px;
+display: inline-block; margin-bottom: 24px;
+}
+.plan-name {
+font-family: 'DM Serif Display', serif;
+font-size: 26px; color: var(--text); margin-bottom: 8px;
+}
+.plan-price {
+font-size: 40px; color: var(--text);
+margin: 20px 0 8px;
+}
+.plan-price sup { font-size: 18px; vertical-align: top; margin-top: 8px; color: var(--muted); }
+.plan-price sub { font-size: 13px; color: var(--muted); }
+.plan-desc {
+font-size: 11px; line-height: 1.8;
+color: var(--muted); margin-bottom: 32px;
+padding-bottom: 32px; border-bottom: 1px solid var(--card-border);
+}
+.plan-features { list-style: none; margin-bottom: 40px; }
+.plan-features li {
+font-size: 11px; letter-spacing: 0.04em;
+color: var(--muted); padding: 10px 0;
+border-bottom: 1px solid rgba(255,255,255,0.03);
+display: flex; align-items: center; gap: 10px;
+}
+.plan-features li::before {
+content: '▸'; color: var(--accent); flex-shrink: 0;
+}
+
+/* ── CTA ── */
+.cta-section {
+padding: 120px 48px;
+text-align: center;
+position: relative; overflow: hidden;
+}
+.cta-glow {
+position: absolute;
+width: 800px; height: 400px;
+background: radial-gradient(ellipse, rgba(79,124,255,0.1) 0%, transparent 70%);
+top: 50%; left: 50%; transform: translate(-50%,-50%);
+pointer-events: none;
+}
+.cta-section h2 {
+font-family: 'DM Serif Display', serif;
+font-size: clamp(36px, 5vw, 64px);
+line-height: 1.1; letter-spacing: -0.02em;
+color: var(--text); max-width: 700px; margin: 0 auto 24px;
+opacity: 0;
+}
+.cta-section h2.visible { animation: fadeUp 0.8s ease forwards; }
+.cta-section p {
+font-size: 12px; color: var(--muted); letter-spacing: 0.06em;
+margin-bottom: 48px; opacity: 0;
+}
+.cta-section p.visible { animation: fadeUp 0.8s 0.2s ease forwards; }
+.cta-actions { opacity: 0; }
+.cta-actions.visible { animation: fadeUp 0.8s 0.4s ease forwards; }
+
+.input-row {
+display: flex; gap: 12px; justify-content: center;
+max-width: 440px; margin: 0 auto;
+}
+.email-input {
+flex: 1; background: rgba(255,255,255,0.04);
+border: 1px solid var(--card-border);
+border-radius: 4px; padding: 14px 20px;
+font-family: 'DM Mono', monospace; font-size: 12px;
+color: var(--text); outline: none;
+transition: border-color 0.3s;
+}
+.email-input::placeholder { color: var(--muted); }
+.email-input:focus { border-color: rgba(79,124,255,0.4); }
+
+/* ── FOOTER ── */
+footer {
+position: relative; z-index: 10;
+border-top: 1px solid var(--card-border);
+padding: 48px;
+display: flex; justify-content: space-between; align-items: center;
+}
+.footer-logo {
+font-family: 'DM Serif Display', serif;
+font-size: 16px; color: var(--muted);
+}
+.footer-copy {
+font-size: 10px; letter-spacing: 0.1em;
+color: var(--muted);
+}
+.footer-links {
+display: flex; gap: 24px; list-style: none;
+}
+.footer-links a {
+font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+color: var(--muted); text-decoration: none;
+transition: color 0.2s;
+}
+.footer-links a:hover { color: var(--text); }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+from { opacity: 0; transform: translateY(30px); }
+to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeLeft {
+from { opacity: 0; transform: translateX(-20px); }
+to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes fadeIn {
+from { opacity: 0; }
+to   { opacity: 1; }
+}
+
+/* ── SCROLL INDICATOR ── */
+.scroll-indicator {
+position: absolute; bottom: 48px; left: 50%; transform: translateX(-50%);
+display: flex; flex-direction: column; align-items: center; gap: 8px;
+opacity: 0; animation: fadeIn 1s 1.8s ease forwards;
+}
+.scroll-indicator span {
+font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+color: var(--muted);
+}
+.scroll-line {
+width: 1px; height: 40px;
+background: linear-gradient(180deg, var(--muted) 0%, transparent 100%);
+animation: scrollDown 2s ease-in-out infinite;
+}
+@keyframes scrollDown {
+0% { transform: scaleY(0); transform-origin: top; }
+50% { transform: scaleY(1); transform-origin: top; }
+51% { transform: scaleY(1); transform-origin: bottom; }
+100% { transform: scaleY(0); transform-origin: bottom; }
+}
+
+/* ── SOURCE LOGOS ROW ── */
+.sources-row {
+display: flex; align-items: center; justify-content: center;
+gap: 48px; padding: 60px 48px;
+border-top: 1px solid var(--card-border);
+position: relative; z-index: 10;
+opacity: 0; animation: fadeIn 1s 1.6s ease forwards;
+}
+.sources-label {
+font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+color: var(--muted); margin-right: 16px;
+}
+.source-badge {
+font-size: 11px; letter-spacing: 0.08em;
+color: var(--muted); display: flex; align-items: center; gap: 6px;
+padding: 8px 16px; border-radius: 4px;
+border: 1px solid rgba(255,255,255,0.06);
+background: rgba(255,255,255,0.02);
+transition: all 0.2s;
+}
+.source-badge:hover { color: var(--text); border-color: var(--card-border); }
+.source-badge .ico { font-size: 14px; }
+
+</style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- Starfield Canvas -->
+<canvas id="starfield"></canvas>
+
+<!-- Grid -->
+<div class="grid-overlay"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <span class="dot"></span>
+    TrendTracker
+  </div>
+  <ul class="nav-links">
+    <li><a href="#how">工作原理</a></li>
+    <li><a href="#features">功能</a></li>
+    <li><a href="#pricing">定价</a></li>
+    <li><a href="#">文档</a></li>
+  </ul>
+  <a href="#" class="nav-cta">免费开始</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+
+  <div class="hero-eyebrow">每日自动更新 · 实时趋势</div>
+
+  <h1 class="hero-title">
+    捕捉下一个
+    <span class="accent-word">爆发趋势</span>
+  </h1>
+
+  <p class="hero-sub">
+    自动抓取 Product Hunt、Reddit、Hacker News<br>
+    等平台最新热门产品与讨论，<br>
+    生成可视化趋势分析报告。
+  </p>
+
+  <div class="hero-actions">
+    <a href="#" class="btn-primary">开始追踪趋势</a>
+    <a href="#how" class="btn-ghost">了解工作原理</a>
+  </div>
+
+  <div class="scroll-indicator">
+    <span>向下探索</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- SOURCE BADGES -->
+<div class="sources-row">
+  <span class="sources-label">数据来源</span>
+  <div class="source-badge"><span class="ico">🔺</span>Product Hunt</div>
+  <div class="source-badge"><span class="ico">👾</span>Reddit</div>
+  <div class="source-badge"><span class="ico">🔶</span>Hacker News</div>
+  <div class="source-badge"><span class="ico">𝕏</span>X / Twitter</div>
+  <div class="source-badge"><span class="ico">📦</span>GitHub Trending</div>
+</div>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker">
+    <span class="ticker-item"><span class="tag ph">PH</span> Cursor v2.0 — AI Code Editor · 2.4k upvotes</span>
+    <span class="ticker-item"><span class="tag">RD</span> r/SideProject — "Shipped my first SaaS" · 8.7k reactions</span>
+    <span class="ticker-item"><span class="tag hn">HN</span> Ask HN: Best tools for solo founders · 420 comments</span>
+    <span class="ticker-item"><span class="tag ph">PH</span> Perplexity Pro — 1.8k upvotes · trending</span>
+    <span class="ticker-item"><span class="tag">GH</span> microsoft/phi-3 — +12k stars this week</span>
+    <span class="ticker-item"><span class="tag hn">HN</span> Launch: Open-source Figma alternative · top story</span>
+    <span class="ticker-item"><span class="tag ph">PH</span> Cursor v2.0 — AI Code Editor · 2.4k upvotes</span>
+    <span class="ticker-item"><span class="tag">RD</span> r/SideProject — "Shipped my first SaaS" · 8.7k reactions</span>
+    <span class="ticker-item"><span class="tag hn">HN</span> Ask HN: Best tools for solo founders · 420 comments</span>
+    <span class="ticker-item"><span class="tag ph">PH</span> Perplexity Pro — 1.8k upvotes · trending</span>
+    <span class="ticker-item"><span class="tag">GH</span> microsoft/phi-3 — +12k stars this week</span>
+    <span class="ticker-item"><span class="tag hn">HN</span> Launch: Open-source Figma alternative · top story</span>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="how">
+    <div class="how-header">
+      <div class="section-label">工作原理</div>
+      <h2 class="section-title">三步，洞察市场脉搏</h2>
+      <p class="section-desc">从数据采集到趋势报告，全程自动化运行，每天早晨你醒来时报告已经准备好。</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <span class="step-num">01</span>
+        <div class="step-icon">⚡</div>
+        <h3>自动抓取</h3>
+        <p>每日定时从多个平台抓取最新产品发布、热门讨论与话题动态。无需手动操作。</p>
+        <div class="sources">
+          <span class="source-tag">Product Hunt</span>
+          <span class="source-tag">Reddit</span>
+          <span class="source-tag">HN</span>
+          <span class="source-tag">GitHub</span>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">02</span>
+        <div class="step-icon">🧠</div>
+        <h3>AI 分析</h3>
+        <p>利用大模型对原始数据进行分类、聚类、情感分析，提炼出真正有信号价值的趋势。</p>
+        <div class="sources">
+          <span class="source-tag">语义聚类</span>
+          <span class="source-tag">情感分析</span>
+          <span class="source-tag">热度评分</span>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">03</span>
+        <div class="step-icon">📊</div>
+        <h3>可视化报告</h3>
+        <p>生成结构化的趋势报告，支持订阅推送至邮件、Feishu、Slack，随时随地掌握动态。</p>
+        <div class="sources">
+          <span class="source-tag">邮件推送</span>
+          <span class="source-tag">飞书</span>
+          <span class="source-tag">Slack</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stats-inner">
+    <div class="stat">
+      <div class="stat-num">5<span>+</span></div>
+      <div class="stat-label">数据来源平台</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">1200<span>+</span></div>
+      <div class="stat-label">日均条目追踪</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">24<span>h</span></div>
+      <div class="stat-label">报告刷新周期</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">98<span>%</span></div>
+      <div class="stat-label">数据覆盖准确率</div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="features">
+    <div class="features-inner">
+      <div class="features-left">
+        <div class="section-label">核心功能</div>
+        <h2 class="section-title">为产品人<br>而设计的<br>趋势雷达</h2>
+        <p class="section-desc">不只是数据聚合工具，TrendTracker 帮你从噪音中识别真正值得关注的产品信号。</p>
+        <div class="feat-list">
+          <div class="feat-item">
+            <div class="feat-icon">🔍</div>
+            <div class="feat-text">
+              <h4>跨平台热度聚合</h4>
+              <p>统一整合多平台数据，按热度、新鲜度、类别多维度排序筛选。</p>
+            </div>
+          </div>
+          <div class="feat-item">
+            <div class="feat-icon">📈</div>
+            <div class="feat-text">
+              <h4>趋势曲线追踪</h4>
+              <p>追踪关键词与产品类别的热度变化曲线，发现爆发前的信号拐点。</p>
+            </div>
+          </div>
+          <div class="feat-item">
+            <div class="feat-icon">🏷️</div>
+            <div class="feat-text">
+              <h4>智能标签分类</h4>
+              <p>AI 自动为每条内容打上产品类别、技术栈、赛道等结构化标签。</p>
+            </div>
+          </div>
+          <div class="feat-item">
+            <div class="feat-icon">🔔</div>
+            <div class="feat-text">
+              <h4>关键词订阅警报</h4>
+              <p>设置自定义关键词，一旦出现相关热门内容立即推送通知。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mock Dashboard -->
+      <div class="dashboard-mock" id="dashMock">
+        <div class="mock-header">
+          <div class="mock-dot" style="background:#ff5f57"></div>
+          <div class="mock-dot" style="background:#febc2e;margin-left:6px"></div>
+          <div class="mock-dot" style="background:#28c840;margin-left:6px"></div>
+          <span class="mock-title">今日趋势报告 · Mar 28</span>
+        </div>
+        <div class="mock-body">
+          <div style="font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:20px;">Top Trending Products</div>
+
+          <div class="trend-row" id="tr1">
+            <span class="trend-rank">#1</span>
+            <span class="trend-label">AI Code Editors</span>
+            <div class="trend-bar-wrap"><div class="trend-bar" style="--w:0.92"></div></div>
+            <span class="trend-score">↑ 94</span>
+          </div>
+          <div class="trend-row" id="tr2">
+            <span class="trend-rank">#2</span>
+            <span class="trend-label">Open Source LLMs</span>
+            <div class="trend-bar-wrap"><div class="trend-bar" style="--w:0.78"></div></div>
+            <span class="trend-score">↑ 78</span>
+          </div>
+          <div class="trend-row" id="tr3">
+            <span class="trend-rank">#3</span>
+            <span class="trend-label">No-code Builders</span>
+            <div class="trend-bar-wrap"><div class="trend-bar" style="--w:0.65"></div></div>
+            <span class="trend-score">↑ 65</span>
+          </div>
+          <div class="trend-row" id="tr4">
+            <span class="trend-rank">#4</span>
+            <span class="trend-label">Agent Frameworks</span>
+            <div class="trend-bar-wrap"><div class="trend-bar" style="--w:0.58"></div></div>
+            <span class="trend-score">↑ 58</span>
+          </div>
+          <div class="trend-row" id="tr5">
+            <span class="trend-rank">#5</span>
+            <span class="trend-label">Design Tools</span>
+            <div class="trend-bar-wrap"><div class="trend-bar" style="--w:0.44"></div></div>
+            <span class="trend-score">↑ 44</span>
+          </div>
+
+          <div class="mini-chart" id="miniChart">
+            <div class="mini-chart-label">7日热度趋势 — AI Tools</div>
+            <div class="chart-bars">
+              <div class="chart-bar" style="height:35%"></div>
+              <div class="chart-bar" style="height:48%"></div>
+              <div class="chart-bar" style="height:42%"></div>
+              <div class="chart-bar" style="height:60%"></div>
+              <div class="chart-bar" style="height:75%"></div>
+              <div class="chart-bar" style="height:68%"></div>
+              <div class="chart-bar" style="height:90%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="pricing">
+    <div class="pricing-header">
+      <div class="section-label">定价方案</div>
+      <h2 class="section-title">选择适合你的计划</h2>
+    </div>
+    <div class="pricing-grid">
+      <div class="plan">
+        <div class="plan-name">Free</div>
+        <div class="plan-price"><sup>¥</sup>0<sub>/月</sub></div>
+        <p class="plan-desc">适合想要入门了解产品趋势的个人用户。</p>
+        <ul class="plan-features">
+          <li>每日摘要报告（Top 10）</li>
+          <li>3 个关键词订阅</li>
+          <li>Product Hunt + HN 数据源</li>
+          <li>邮件推送</li>
+        </ul>
+        <a href="#" class="btn-ghost" style="display:block;text-align:center;padding:12px">开始使用</a>
+      </div>
+      <div class="plan featured">
+        <div class="plan-badge">最受欢迎</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-price"><sup>¥</sup>99<sub>/月</sub></div>
+        <p class="plan-desc">适合产品经理、独立开发者和创业团队。</p>
+        <ul class="plan-features">
+          <li>全量趋势报告（Top 50）</li>
+          <li>20 个关键词订阅</li>
+          <li>全部 5 个数据源</li>
+          <li>趋势曲线历史查询</li>
+          <li>Slack / 飞书推送</li>
+          <li>CSV 数据导出</li>
+        </ul>
+        <a href="#" class="btn-primary" style="display:block;text-align:center;padding:12px">升级 Pro</a>
+      </div>
+      <div class="plan">
+        <div class="plan-name">Team</div>
+        <div class="plan-price"><sup>¥</sup>399<sub>/月</sub></div>
+        <p class="plan-desc">适合需要协作共享趋势洞察的产品团队。</p>
+        <ul class="plan-features">
+          <li>无限关键词订阅</li>
+          <li>团队共享工作空间</li>
+          <li>自定义数据源接入</li>
+          <li>API 访问权限</li>
+          <li>专属客户支持</li>
+        </ul>
+        <a href="#" class="btn-ghost" style="display:block;text-align:center;padding:12px">联系我们</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-glow"></div>
+  <h2 id="ctaTitle">别让趋势<br>在你睡着时溜走</h2>
+  <p id="ctaDesc">加入 TrendTracker，每天早晨醒来时市场动态已经为你梳理好。</p>
+  <div class="cta-actions" id="ctaActions">
+    <div class="input-row">
+      <input type="email" class="email-input" placeholder="your@email.com">
+      <a href="#" class="btn-primary" style="white-space:nowrap">免费开始</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">TrendTracker</div>
+  <ul class="footer-links">
+    <li><a href="#">关于</a></li>
+    <li><a href="#">文档</a></li>
+    <li><a href="#">隐私政策</a></li>
+  </ul>
+  <div class="footer-copy">© 2025 TrendTracker. All rights reserved.</div>
+</footer>
+
+<script>
+// ── Cursor ──
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+});
+
+function lerp(a, b, t) { return a + (b - a) * t; }
+function animRing() {
+  rx = lerp(rx, mx, 0.12); ry = lerp(ry, my, 0.12);
+  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+  requestAnimationFrame(animRing);
+}
+animRing();
+
+document.querySelectorAll('a, button, .step, .feat-item, .plan, .source-badge').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    cursor.style.width = '20px'; cursor.style.height = '20px';
+    ring.style.width = '56px'; ring.style.height = '56px';
+    ring.style.borderColor = 'rgba(79,124,255,0.8)';
+  });
+  el.addEventListener('mouseleave', () => {
+    cursor.style.width = '12px'; cursor.style.height = '12px';
+    ring.style.width = '36px'; ring.style.height = '36px';
+    ring.style.borderColor = 'rgba(79,124,255,0.5)';
+  });
+});
+
+// ── Starfield ──
+const canvas = document.getElementById('starfield');
+const ctx = canvas.getContext('2d');
+let stars = [], W, H;
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+function initStars() {
+  stars = [];
+  for (let i = 0; i < 160; i++) {
+    stars.push({
+      x: Math.random() * W, y: Math.random() * H,
+      r: Math.random() * 1.4 + 0.3,
+      op: Math.random() * 0.5 + 0.1,
+      vx: (Math.random() - 0.5) * 0.08,
+      vy: (Math.random() - 0.5) * 0.08,
+      twinkle: Math.random() * Math.PI * 2,
+      twinkleSpeed: 0.005 + Math.random() * 0.015
+    });
+  }
+}
+initStars();
+
+function drawStars() {
+  ctx.clearRect(0, 0, W, H);
+  stars.forEach(s => {
+    s.twinkle += s.twinkleSpeed;
+    const op = s.op * (0.6 + 0.4 * Math.sin(s.twinkle));
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(180,200,255,${op})`;
+    ctx.fill();
+    s.x += s.vx; s.y += s.vy;
+    if (s.x < 0) s.x = W;
+    if (s.x > W) s.x = 0;
+    if (s.y < 0) s.y = H;
+    if (s.y > H) s.y = 0;
+  });
+
+  // Draw faint connections for nearby stars
+  for (let i = 0; i < stars.length; i++) {
+    for (let j = i + 1; j < stars.length; j++) {
+      const dx = stars[i].x - stars[j].x;
+      const dy = stars[i].y - stars[j].y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 100) {
+        ctx.beginPath();
+        ctx.moveTo(stars[i].x, stars[i].y);
+        ctx.lineTo(stars[j].x, stars[j].y);
+        ctx.strokeStyle = `rgba(79,124,255,${0.04 * (1 - dist/100)})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    }
+  }
+
+  requestAnimationFrame(drawStars);
+}
+drawStars();
+
+// ── Scroll Animations (IntersectionObserver) ──
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.15 });
+
+document.querySelectorAll('.step, .feat-item, .stat, .plan, #dashMock').forEach((el, i) => {
+  el.style.animationDelay = (i * 0.12) + 's';
+  observer.observe(el);
+});
+
+document.querySelectorAll('#ctaTitle, #ctaDesc, #ctaActions').forEach(el => observer.observe(el));
+
+// ── Trend bars & chart ──
+const barObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      // Animate trend rows
+      const rows = ['tr1','tr2','tr3','tr4','tr5'];
+      rows.forEach((id, i) => {
+        setTimeout(() => {
+          const row = document.getElementById(id);
+          if (row) {
+            row.classList.add('visible');
+            const bar = row.querySelector('.trend-bar');
+            if (bar) {
+              setTimeout(() => bar.classList.add('animated'), 100);
+            }
+          }
+        }, i * 120);
+      });
+
+      // Animate chart bars
+      setTimeout(() => {
+        document.querySelectorAll('.chart-bar').forEach((bar, i) => {
+          setTimeout(() => bar.classList.add('animated'), i * 80);
+        });
+      }, 600);
+    }
+  });
+}, { threshold: 0.3 });
+
+const dashEl = document.getElementById('dashMock');
+if (dashEl) barObserver.observe(dashEl);
+
+// ── Parallax on hero glows ──
+document.addEventListener('mousemove', e => {
+  const dx = (e.clientX / window.innerWidth - 0.5) * 40;
+  const dy = (e.clientY / window.innerHeight - 0.5) * 40;
+  document.querySelector('.hero-glow').style.transform =
+    `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+  document.querySelector('.hero-glow2').style.transform =
+    `translate(calc(-50% + ${dx * 0.6}px), calc(-50% + ${dy * 0.6}px))`;
+});
+
+// ── Number counter animation ──
+const counterObs = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.querySelectorAll('.stat-num').forEach(el => {
+        const text = el.textContent;
+        const num = parseFloat(text.replace(/[^0-9.]/g, ''));
+        const suffix = text.replace(/[0-9.]/g, '');
+        let start = 0;
+        const duration = 1500;
+        const step = (ts) => {
+          if (!start) start = ts;
+          const progress = Math.min((ts - start) / duration, 1);
+          const ease = 1 - Math.pow(1 - progress, 3);
+          el.textContent = Math.floor(ease * num) + suffix;
+          if (progress < 1) requestAnimationFrame(step);
+          else el.innerHTML = num + '<span>' + suffix.slice(-1) + '</span>';
+        };
+        requestAnimationFrame(step);
+      });
+      counterObs.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.5 });
+
+document.querySelectorAll('.stats-inner').forEach(el => counterObs.observe(el));
+
+// ── Typewriter for hero ──
+const titleEl = document.querySelector('.hero-title .accent-word');
+const words = ['爆发趋势', '产品机会', '市场信号', '下一个风口'];
+let wi = 0, ci = 0, deleting = false;
+
+function typewriter() {
+  const word = words[wi];
+  if (!deleting) {
+    titleEl.textContent = word.slice(0, ci + 1);
+    ci++;
+    if (ci === word.length) {
+      deleting = true;
+      setTimeout(typewriter, 2400);
+      return;
+    }
+  } else {
+    titleEl.textContent = word.slice(0, ci - 1);
+    ci--;
+    if (ci === 0) {
+      deleting = false;
+      wi = (wi + 1) % words.length;
+    }
+  }
+  setTimeout(typewriter, deleting ? 60 : 100);
+}
+setTimeout(typewriter, 2000);
+</script>
+
+</body>
+</html>

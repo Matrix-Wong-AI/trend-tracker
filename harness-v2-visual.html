@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Harness v2.0 · 完整流程实录</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+            background: #fff;
+            color: #000;
+            line-height: 1.6;
+        }
+        
+        /* 顶部通栏 */
+        .header {
+            background: #000;
+            color: #fff;
+            padding: 40px 24px;
+            position: relative;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            right: 24px;
+            width: 12px;
+            height: 12px;
+            background: #ff0000;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 8px;
+        }
+        .header .meta {
+            font-size: 14px;
+            opacity: 0.6;
+            font-weight: 400;
+        }
+        
+        /* 大数字章节 */
+        .section {
+            padding: 48px 24px;
+            border-bottom: 1px solid #eee;
+        }
+        .section-title {
+            font-size: 72px;
+            font-weight: 900;
+            color: #000;
+            line-height: 1;
+            margin-bottom: 24px;
+            letter-spacing: -4px;
+        }
+        .section-subtitle {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 32px;
+            color: #333;
+        }
+        
+        /* 四格规划 */
+        .grid-2x2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 24px 0;
+        }
+        .grid-item {
+            border: 2px solid #000;
+            padding: 20px;
+            position: relative;
+        }
+        .grid-item::before {
+            content: attr(data-label);
+            position: absolute;
+            top: -10px;
+            left: 16px;
+            background: #fff;
+            padding: 0 8px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .grid-item h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .grid-item p {
+            font-size: 13px;
+            color: #555;
+            line-height: 1.5;
+        }
+        
+        /* 红色时间线 */
+        .timeline {
+            position: relative;
+            padding-left: 32px;
+            margin: 32px 0;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: #ff0000;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 32px;
+            padding-left: 24px;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -28px;
+            top: 4px;
+            width: 12px;
+            height: 12px;
+            background: #ff0000;
+            border-radius: 50%;
+            border: 3px solid #fff;
+            box-shadow: 0 0 0 2px #ff0000;
+        }
+        .timeline-item .time {
+            font-size: 12px;
+            font-weight: 700;
+            color: #ff0000;
+            margin-bottom: 4px;
+        }
+        .timeline-item .title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .timeline-item .desc {
+            font-size: 14px;
+            color: #555;
+        }
+        
+        /* 黑色标签 */
+        .tag {
+            display: inline-block;
+            background: #000;
+            color: #fff;
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        
+        /* 黑底结果卡 */
+        .result-card {
+            background: #000;
+            color: #fff;
+            padding: 32px 24px;
+            margin: 32px 0;
+        }
+        .result-card h3 {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+        }
+        .result-card .metric {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #333;
+            font-size: 14px;
+        }
+        .result-card .metric:last-child {
+            border-bottom: none;
+        }
+        .result-card .metric span:first-child {
+            opacity: 0.6;
+        }
+        .result-card .metric span:last-child {
+            font-weight: 700;
+        }
+        
+        /* 迭代标签 */
+        .round-tag {
+            display: inline-block;
+            border: 2px solid #000;
+            padding: 4px 12px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        
+        /* 代码块 */
+        .code-block {
+            background: #f5f5f5;
+            padding: 20px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            overflow-x: auto;
+            margin: 16px 0;
+        }
+        
+        /* 问题卡 */
+        .problem-card {
+            border-left: 4px solid #ff0000;
+            padding: 16px 20px;
+            background: #fff5f5;
+            margin: 16px 0;
+        }
+        .problem-card .title {
+            font-weight: 700;
+            color: #ff0000;
+            margin-bottom: 8px;
+        }
+        
+        /* 解决卡 */
+        .solution-card {
+            border-left: 4px solid #000;
+            padding: 16px 20px;
+            background: #f5f5f5;
+            margin: 16px 0;
+        }
+        .solution-card .title {
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+    <h1>CONTENT HARNESS v2.0</h1>
+    <div class="meta">完整流程实录 · 2026年4月3日 · 杭州</div>
+</div>
+
+<!-- 01 项目启动 -->
+<div class="section">
+    <div class="section-title">01</div>
+    <div class="section-subtitle">项目启动：从 Skill 到 Harness 的认知跃迁</div>
+    
+    <div class="grid-2x2">
+        <div class="grid-item" data-label="Target">
+            <h4>目标</h4>
+            <p>构建基于 Anthropic Harness Engineering 设计原则的内容自动化系统</p>
+        </div>
+        <div class="grid-item" data-label="Challenge">
+            <h4>核心挑战</h4>
+            <p>v1.0 是质量管控系统，v2.0 要变成对抗式创作系统</p>
+        </div>
+        <div class="grid-item" data-label="Key Insight">
+            <h4>关键洞察</h4>
+            <p>Agent 简单，环境复杂。环境承担复杂性，Agent 专注创作。</p>
+        </div>
+        <div class="grid-item" data-label="Output">
+            <h4>交付物</h4>
+            <p>6层 Harness 架构 + 完整运行实例</p>
+        </div>
+    </div>
+</div>
+
+<!-- 02 核心架构 -->
+<div class="section">
+    <div class="section-title">02</div>
+    <div class="section-subtitle">v2.0 核心架构：三层进化</div>
+    
+    <span class="round-tag">ROUND 1: v1.0 问题</span>
+    <div class="problem-card">
+        <div class="title">质量管控 ≠ 价值创造</div>
+        <p>v1.0 能拦住错误，拦不住平庸。合规的文章读完毫无收获。</p>
+    </div>
+    
+    <span class="round-tag">ROUND 2: v2.0 方案</span>
+    <div class="solution-card">
+        <div class="title">对抗式创作系统</div>
+        <p>Generator 和 Evaluator 之间有张力，推动内容从"合格"走向"有洞察"。</p>
+    </div>
+    
+    <span class="round-tag">ROUND 3: 核心机制</span>
+    <div class="timeline">
+        <div class="timeline-item">
+            <div class="time">LAYER 0</div>
+            <div class="title">Light Input · 轻量输入</div>
+            <div class="desc">链接 + 角度 + 类型。输入减负，让 Planner 扛重活。</div>
+        </div>
+        <div class="timeline-item">
+            <div class="time">LAYER 1</div>
+            <div class="title">Planner · 策划者</div>
+            <div class="desc">抓取、提取、评分、缺口分析、结构规划。自动生成大纲。</div>
+        </div>
+        <div class="timeline-item">
+            <div class="time">LAYER 2</div>
+            <div class="title">Sprint Contract · Sprint 合同</div>
+            <div class="desc">写前对齐验收标准。把"写完发现方向不对"前移到"动笔前"。</div>
+        </div>
+        <div class="timeline-item">
+            <div class="time">LAYER 3</div>
+            <div class="title">Generator · 执行者</div>
+            <div class="desc">按合同分段执行，只使用 Planner 提供的事实。</div>
+        </div>
+        <div class="timeline-item">
+            <div class="time">LAYER 4</div>
+            <div class="title">Evaluator · 审核者</div>
+            <div class="desc">硬性规则 + 洞察度判断。查"有没有认知增量"。</div>
+        </div>
+        <div class="timeline-item">
+            <div class="time">LAYER 5</div>
+            <div class="title">Human-in-the-Loop · 人在回路</div>
+            <div class="desc">事实确认、风格校准、发布决策。</div>
+        </div>
+    </div>
+</div>
+
+<!-- 03 实战运行 -->
+<div class="section">
+    <div class="section-title">03</div>
+    <div class="section-subtitle">实战运行：Claude Code 泄露事件</div>
+    
+    <div class="timeline">
+        <div class="timeline-item">
+            <div class="time">20:46</div>
+            <div class="title">Layer 0: 轻量输入</div>
+            <div class="desc">链接 + 角度"AI生产力时代结束，Harness成为新战场" + 类型"热点解读"</div>
+        </div>
+        <div class="timeline-item">
+            <div class="time">20:47</div>
+            <div class="title">Layer 1: Planner 执行</div>
+            <div class="desc">❌ 抓取失败（LinkedIn 451）。进入降级路径：换选题。</div>
+        </div>
+        <div class="timeline-item">
+            <div class="time">20:48</div>
+            <div class="title">Layer 0: 新输入</div>
+            <div class="desc">硅基立场《Claude Code 泄露》+ 角度"源码泄露是创业者地图"</div>
+        </div>
+        <div class="timeline-item">
+            <div class="time">20:56</div>
+            <div class="title">Layer 1: Planner 完成</div>
+            <div class="desc">提取 8 条结构化事实，2 条 gaps，生成 5 段 outline。</div>
+        </div>
+        <div class="timeline-item">
+            <div class="time">20:59</div>
+            <div class="title">Layer 2: Sprint 合同</div>
+            <div class="desc">生成合同，对齐验收标准。用户要求调整目标人群。</div>
+        </div>
+        <div class="timeline-item">
+            <div class="time">21:17</div>
+            <div class="title">Layer 2: 合同确认</div>
+            <div class="desc">更新为产品经理/创业者/技术小白友好版本。</div>
+        </div>
+        <div class="timeline-item">
+            <div class="time">22:00</div>
+            <div class="title">Layer 3-4: Generator + Evaluator</div>
+            <div class="desc">分段生成，硬性规则 PASS，洞察度检查 PASS。</div>
+        </div>
+    </div>
+</div>
+
+<!-- 04 Sprint 合同示例 -->
+<div class="section">
+    <div class="section-title">04</div>
+    <div class="section-subtitle">关键创新：Sprint 合同机制</div>
+    
+    <div class="code-block">
+Sprint 合同 — CH-20260403-v2
+
+【文章类型】热点解读
+【目标人群】产品经理、创业者、AI关注者（非技术背景）
+【目标字数】1000-1200
+
+【Section 1: Hook + 事件还原】
+验收标准：
+- 第1句反直觉结论
+- 用"Dropbox 手滑"类比解释泄露
+- 数字震撼：51万行 = 4年心血
+洞察度：让读者意识到"这是机会"
+
+【Section 2: Claude Code 是什么】
+验收标准：
+- 不用技术术语（状态机→"交通指挥中心"）
+- 类比：输入法 vs 操作系统
+洞察度：底座越强大，应用生态越有价值
+
+【Section 3: 两个信号看懂未来】
+验收标准：
+- KAIROS → "自动巡航"类比
+- PROACTIVE → "主动秘书"类比
+洞察度：AI 从"工具"变成"同事"
+
+【Section 4: 三张地图三个机会】
+验收标准：
+- 训练环境（AI的驾校）
+- 垂直行业（AI的装修队）
+- 独立裁判（AI的审计师）
+洞察度：巨头搭台，创业者唱戏
+
+【Section 5: 现在就能用的判断法】
+验收标准：
+- 具体筛选标准：Anthropic 会不会自己做？
+- 举例说明
+洞察度：读者能立即应用到创业判断
+
+【风格约束】
+禁用词：值得注意的是 / 总的来说 / 毋庸置疑 / 赋能 / 闭环
+技术术语必须配类比
+每段不超过5行
+语调：商业洞察、机会感、轻技术
+    </div>
+</div>
+
+<!-- 05 结果 -->
+<div class="section">
+    <div class="section-title">05</div>
+    <div class="section-subtitle">最终交付</div>
+    
+    <div class="result-card">
+        <h3>ARTICLE CH-20260403-v2</h3>
+        <div class="metric">
+            <span>标题</span>
+            <span>Anthropic 不小心"开源"了自家王牌，创业者应该偷着乐</span>
+        </div>
+        <div class="metric">
+            <span>字数</span>
+            <span>1186 字</span>
+        </div>
+        <div class="metric">
+            <span>洞察度评级</span>
+            <span>🔥 高洞察度</span>
+        </div>
+        <div class="metric">
+            <span>硬性规则</span>
+            <span>✅ 全部 PASS</span>
+        </div>
+        <div class="metric">
+            <span>目标人群适配</span>
+            <span>✅ 产品经理/创业者/技术小白</span>
+        </div>
+        <div class="metric">
+            <span>状态</span>
+            <span>待人工审核（Layer 5）</span>
+        </div>
+    </div>
+    
+    <span class="tag">6 层架构</span>
+    <span class="tag">Sprint 合同</span>
+    <span class="tag">对抗式创作</span>
+    <span class="tag">洞察度判断</span>
+    <span class="tag">零幻觉</span>
+</div>
+
+<!-- 06 关键认知 -->
+<div class="section" style="border-bottom: none;">
+    <div class="section-title">06</div>
+    <div class="section-subtitle">关键认知升级</div>
+    
+    <div class="grid-2x2">
+        <div class="grid-item" data-label="Before">
+            <h4>v1.0 思维</h4>
+            <p>"我写一篇文章"<br>随机选题 → 直接写 → 你审</p>
+        </div>
+        <div class="grid-item" data-label="After">
+            <h4>v2.0 思维</h4>
+            <p>"我设计一个系统"<br>Planner 策划 → Sprint 合同对齐 → Generator 执行 → Evaluator 对抗检查</p>
+        </div>
+        <div class="grid-item" data-label="Insight">
+            <h4>核心洞察</h4>
+            <p>Harness Engineering 不是让 Agent 更聪明，是给 Agent 建一个"傻瓜也能成功"的环境</p>
+        </div>
+        <div class="grid-item" data-label="Next">
+            <h4>下一步</h4>
+            <p>本周跑通 5 篇，建立数据闭环，周日复盘迭代 Harness 本身</p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
